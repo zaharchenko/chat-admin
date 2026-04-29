@@ -1,7 +1,10 @@
 <template>
   <div class="editor-container">
     <!-- Sidebar for command list and editing -->
-    <div class="sidebar">
+    <div class="sidebar" :class="{ collapsed: sidebarCollapsed }">
+      <button @click="toggleSidebar" class="sidebar-toggle">
+        {{ sidebarCollapsed ? '▶' : '◀' }}
+      </button>
       <h2>Команды чата</h2>
       
       <!-- Command List -->
@@ -112,6 +115,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
+import { MarkerType } from '@vue-flow/core'
 
 // Default data from the example
 const defaultData = [
@@ -130,6 +134,12 @@ const defaultData = [
 const commands = ref(JSON.parse(JSON.stringify(defaultData)))
 const selectedCommand = ref(null)
 const keywordsText = ref('')
+const sidebarCollapsed = ref(false)
+
+// Toggle sidebar
+function toggleSidebar() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+}
 
 // Computed properties
 const availableCommands = computed(() => {
@@ -165,6 +175,13 @@ function updateFlow() {
           id: `${cmd.id}-${childId}`,
           source: cmd.id,
           target: childId,
+          type: 'smoothstep',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: '#666',
+            width: 20,
+            height: 20
+          },
           style: { stroke: '#666', strokeWidth: 2 }
         })
       })
@@ -297,7 +314,9 @@ onMounted(() => {
 .editor-container {
   display: flex;
   height: 100vh;
+  width: 100vw;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -306,6 +325,33 @@ onMounted(() => {
   border-right: 1px solid #ddd;
   overflow-y: auto;
   padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  padding: 20px 0;
+  overflow: hidden;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 10px;
+  right: -30px;
+  width: 30px;
+  height: 50px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 100;
+}
+
+.sidebar-toggle:hover {
+  background: #45a049;
 }
 
 h2, h3 {
@@ -500,5 +546,16 @@ textarea:focus {
 .flow-container {
   flex: 1;
   height: 100%;
+  width: 100%;
+}
+
+/* Hide BaseEdge component - we use edges from VueFlow */
+:deep(.vue-flow__edge-path) {
+  stroke: #666;
+  stroke-width: 2;
+}
+
+:deep(.vue-flow__edge-text) {
+  font-size: 10px;
 }
 </style>
