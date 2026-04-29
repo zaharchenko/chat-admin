@@ -304,6 +304,7 @@
 	let selectedFields = [];
 	let reportData = [];
 	let smartProcesses = [];
+	
 	// Стандартные сущности
 	const standardEntities = {
 		1: 'Лиды',
@@ -312,6 +313,12 @@
 		4: 'Компании',
 		31: 'Счета'
 	};
+	
+	// Делаем функции доступными глобально для onclick обработчиков
+	window.testConnection = testConnection;
+	window.loadSmartProcesses = loadSmartProcesses;
+	window.generateReport = generateReport;
+	window.exportToCSV = exportToCSV;
 	// Инициализация
 	document.addEventListener('DOMContentLoaded', function() {
 		initEntitySelection();
@@ -369,13 +376,16 @@
 		const container = document.getElementById('fieldsContainer');
 		container.innerHTML = '';
 		// Сортируем поля: сначала стандартные, потом пользовательские
-		const sortedFields = fields ? Object.entries(fields).sort((a, b) => {
-			const aIsCustom = a[0].startsWith('UF_');
-			const bIsCustom = b[0].startsWith('UF_');
-			if (aIsCustom && !bIsCustom) return 1;
-			if (!aIsCustom && bIsCustom) return -1;
-			return a[1].title.localeCompare(b[1].title);
-		});
+		let sortedFields = [];
+		if (fields) {
+			sortedFields = Object.entries(fields).sort((a, b) => {
+				const aIsCustom = a[0].startsWith('UF_');
+				const bIsCustom = b[0].startsWith('UF_');
+				if (aIsCustom && !bIsCustom) return 1;
+				if (!aIsCustom && bIsCustom) return -1;
+				return a[1].title.localeCompare(b[1].title);
+			});
+		}
 		sortedFields.forEach(([code, field]) => {
 			const checkboxDiv = document.createElement('div');
 			checkboxDiv.className = 'field-checkbox';
