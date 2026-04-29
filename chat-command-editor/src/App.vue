@@ -1,6 +1,6 @@
 <template>
   <div class="editor-container">
-    <!-- Sidebar for command list and editing -->
+    <!-- Sidebar for command list -->
     <div class="sidebar" :class="{ collapsed: sidebarCollapsed }">
       <button @click="toggleSidebar" class="sidebar-toggle">
         {{ sidebarCollapsed ? '▶' : '◀' }}
@@ -15,7 +15,7 @@
             v-for="command in commands"
             :key="command.id"
             :class="{ active: selectedCommand?.id === command.id }"
-            @click="selectCommand(command)"
+            @click="openEditModal(command)"
           >
             <span class="command-name">{{ command.name || 'Без имени' }}</span>
             <span class="command-id">{{ command.id }}</span>
@@ -23,11 +23,30 @@
           </li>
         </ul>
       </div>
+    </div>
 
-      <!-- Command Editor -->
+    <!-- VueFlow Diagram -->
+    <div class="flow-container">
+      <VueFlow
+        v-model:nodes="nodes"
+        v-model:edges="edges"
+        :default-zoom="1"
+        :min-zoom="0.2"
+        :max-zoom="4"
+        :fit-view-on-init="true"
+        @node-click="onNodeClick"
+      >
+        <Background />
+        <Controls />
+      </VueFlow>
+    </div>
+
+    <!-- Edit Modal -->
+    <ModalDialog
+      v-model="isEditModalOpen"
+      title="Редактирование команды"
+    >
       <div v-if="selectedCommand" class="command-editor">
-        <h3>Редактирование команды</h3>
-
         <div class="form-group">
           <label>ID:</label>
           <input v-model="selectedCommand.id" type="text" @blur="validateId" />
@@ -86,27 +105,7 @@
           <button @click="loadFromJson" class="btn-load">Загрузить JSON</button>
         </div>
       </div>
-
-      <div v-else class="no-selection">
-        Выберите команду для редактирования
-      </div>
-    </div>
-
-    <!-- VueFlow Diagram -->
-    <div class="flow-container">
-      <VueFlow
-        v-model:nodes="nodes"
-        v-model:edges="edges"
-        :default-zoom="1"
-        :min-zoom="0.2"
-        :max-zoom="4"
-        :fit-view-on-init="true"
-        @node-click="onNodeClick"
-      >
-        <Background />
-        <Controls />
-      </VueFlow>
-    </div>
+    </ModalDialog>
   </div>
 </template>
 
@@ -117,6 +116,7 @@ import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MarkerType } from '@vue-flow/core'
 import { getLayoutedElements } from './useLayout'
+import ModalDialog from './components/ModalDialog.vue'
 
 // Default data from the example
 const defaultData = [
@@ -136,6 +136,7 @@ const commands = ref(JSON.parse(JSON.stringify(defaultData)))
 const selectedCommand = ref(null)
 const keywordsText = ref('')
 const sidebarCollapsed = ref(false)
+const isEditModalOpen = ref(false)
 
 // Toggle sidebar
 function toggleSidebar() {
@@ -225,6 +226,12 @@ function selectCommand(command) {
   keywordsText.value = command.keywords.join(', ')
 }
 
+// Open edit modal
+function openEditModal(command) {
+  selectCommand(command)
+  isEditModalOpen.value = true
+}
+
 // Add new command
 function addNewCommand() {
   const newId = 'cmd_' + Date.now()
@@ -238,7 +245,7 @@ function addNewCommand() {
     childs: []
   }
   commands.value.push(newCommand)
-  selectCommand(newCommand)
+  openEditModal(newCommand)
 }
 
 // Delete command
@@ -325,7 +332,7 @@ function loadFromJson() {
 function onNodeClick(event) {
   const command = commands.value.find(c => c.id === event.node.id)
   if (command) {
-    selectCommand(command)
+    openEditModal(command)
   }
 }
 
@@ -465,13 +472,6 @@ li.active {
   background: #d32f2f;
 }
 
-.command-editor {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
 .form-group {
   margin-bottom: 15px;
 }
@@ -572,6 +572,13 @@ textarea:focus {
   text-align: center;
   color: #999;
   padding: 40px 20px;
+}
+
+/* Modal editor styles */
+.command-editor {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
 }
 
 .flow-container {
