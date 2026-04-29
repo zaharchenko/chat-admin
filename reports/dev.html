@@ -5,344 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛠️ Конструктор отчётов Битрикс24</title>
     <style>
-        :root {
-            --primary: #2d89ef;
-            --primary-hover: #1b73d6;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --bg: #f5f7fa;
-            --card: #fff;
-            --border: #e0e0e0;
-            --text: #333;
-            --text-muted: #666;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-            padding: 20px;
-        }
-        .container { max-width: 1400px; margin: 0 auto; }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        header h1 { display: flex; align-items: center; gap: 10px; color: #2c3e50; font-size: 20px; }
-        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-        /* Cards */
-        .card {
-            background: var(--card);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Form elements */
-        .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
-        .form-group { flex: 1; min-width: 200px; }
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: var(--text-muted);
-        }
-        select, input[type="text"], input[type="date"], input[type="number"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 14px;
-            background: #fff;
-        }
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(45,137,239,0.1);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: var(--primary-hover); }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
-        .btn-secondary { background: #6c757d; }
-        .btn-secondary:hover { background: #5a6268; }
-        .btn-success { background: var(--success); }
-        .btn-success:hover { background: #218838; }
-        .btn-danger { background: var(--danger); }
-        .btn-sm { padding: 6px 12px; font-size: 13px; }
-
-        /* Field selector */
-        .field-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
-        .field-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: #fff;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .field-item:hover { border-color: var(--primary); background: #f0f7ff; }
-        .field-item input { cursor: pointer; }
-        .field-item.selected {
-            border-color: var(--primary);
-            background: #e8f4fd;
-            box-shadow: 0 0 0 2px rgba(45,137,239,0.2);
-        }
-        .field-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .field-type {
-            font-size: 11px;
-            color: #999;
-            background: #eee;
-            padding: 2px 6px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-        .field-status-indicator {
-            color: #2d89ef;
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        /* Filters builder */
-        .filter-item {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            border: 1px solid var(--border);
-        }
-        .filter-item select { min-width: 140px; }
-        .filter-item input { min-width: 120px; }
-        .filter-actions { margin-left: auto; display: flex; gap: 5px; }
-
-        /* Table */
-        .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            background: #fff;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-            position: sticky;
-            top: 0;
-            cursor: pointer;
-            user-select: none;
-            z-index: 5;
-        }
-        th:hover { background: #e9ecef; }
-        th.sorted-asc::after { content: ' ▲'; font-size: 10px; color: var(--primary); }
-        th.sorted-desc::after { content: ' ▼'; font-size: 10px; color: var(--primary); }
-        tr:hover { background: #f8f9ff; }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: var(--card);
-            border-radius: 8px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Status badges */
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            background: #e9ecef;
-            color: #495057;
-        }
-        .badge.status-badge {
-            background: var(--badge-bg, #e9ecef);
-            color: var(--badge-color, #495057);
-            border: 1px solid var(--badge-border, transparent);
-        }
-
-        /* Loading */
-        .loading {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-muted);
-            padding: 20px;
-            justify-content: center;
-        }
-        .spinner {
-            width: 20px; height: 20px;
-            border: 3px solid #e0e0e0;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
-
-        /* Toast notifications */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: #333;
-            color: #fff;
-            border-radius: 8px;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            max-width: 350px;
-        }
-        .toast.success { background: var(--success); }
-        .toast.error { background: var(--danger); }
-        .toast.info { background: var(--primary); }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Saved reports */
-        .saved-report {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 3px solid var(--primary);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .saved-report-name { font-weight: 600; }
-        .saved-report-meta { font-size: 12px; color: var(--text-muted); }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--card);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-row { flex-direction: column; }
-            .filter-item { flex-direction: column; align-items: stretch; }
-            .filter-actions { margin-left: 0; justify-content: flex-end; }
-            header { flex-direction: column; align-items: flex-start; }
-            .field-grid { grid-template-columns: 1fr; }
-            .pagination { flex-direction: column; gap: 8px; }
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.95);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .loading-overlay.active { display: flex; }
-        .loading-overlay .spinner { width: 40px; height: 40px; border-width: 4px; }
+        :root{--primary:#2d89ef;--primary-hover:#1b73d6;--success:#28a745;--warning:#ffc107;--danger:#dc3545;--bg:#f5f7fa;--card:#fff;--border:#e0e0e0;--text:#333;--text-muted:#666}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding:20px}
+        .container{max-width:1400px;margin:0 auto}
+        header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+        header h1{display:flex;align-items:center;gap:10px;color:#2c3e50;font-size:20px}
+        .header-actions{display:flex;gap:10px;flex-wrap:wrap}
+        .card{background:var(--card);border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+        .card-title{font-size:16px;font-weight:600;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+        .form-row{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:15px}
+        .form-group{flex:1;min-width:200px}
+        .form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;color:var(--text-muted)}
+        select,input[type="text"],input[type="date"],input[type="number"]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:#fff}
+        select:focus,input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(45,137,239,0.1)}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s}
+        .btn:hover{background:var(--primary-hover)}
+        .btn:disabled{background:#ccc;cursor:not-allowed}
+        .btn-secondary{background:#6c757d}
+        .btn-secondary:hover{background:#5a6268}
+        .btn-success{background:var(--success)}
+        .btn-success:hover{background:#218838}
+        .btn-danger{background:var(--danger)}
+        .btn-sm{padding:6px 12px;font-size:13px}
+        .field-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:10px;background:#f8f9fa;border-radius:6px;border:1px solid var(--border)}
+        .field-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:all 0.2s}
+        .field-item:hover{border-color:var(--primary);background:#f0f7ff}
+        .field-item input{cursor:pointer}
+        .field-item.selected{border-color:var(--primary);background:#e8f4fd;box-shadow:0 0 0 2px rgba(45,137,239,0.2)}
+        .field-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .field-type{font-size:11px;color:#999;background:#eee;padding:2px 6px;border-radius:4px;flex-shrink:0}
+        .filter-item{display:flex;gap:10px;align-items:center;padding:12px;background:#f8f9fa;border-radius:8px;margin-bottom:10px;flex-wrap:wrap;border:1px solid var(--border)}
+        .filter-item select{min-width:140px}
+        .filter-item input{min-width:120px}
+        .filter-actions{margin-left:auto;display:flex;gap:5px}
+        .table-container{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+        table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+        th,td{padding:12px 15px;text-align:left;border-bottom:1px solid var(--border)}
+        th{background:#f8f9fa;font-weight:600;color:#495057;position:sticky;top:0;cursor:pointer;user-select:none;z-index:5}
+        th:hover{background:#e9ecef}
+        th.sorted-asc::after{content:' ▲';font-size:10px;color:var(--primary)}
+        th.sorted-desc::after{content:' ▼';font-size:10px;color:var(--primary)}
+        tr:hover{background:#f8f9ff}
+        .pagination{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;background:var(--card);border-radius:8px;margin-top:15px;flex-wrap:wrap}
+        .pagination button:disabled{opacity:0.5;cursor:not-allowed}
+        .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#e9ecef;color:#495057}
+        .badge.status-badge{background:var(--badge-bg,#e9ecef);color:var(--badge-color,#495057);border:1px solid var(--badge-border,transparent)}
+        .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
+        .empty-state-icon{font-size:48px;margin-bottom:15px;opacity:0.5}
+        .toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;background:#333;color:#fff;border-radius:8px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;animation:slideIn 0.3s ease;max-width:350px}
+        .toast.success{background:var(--success)}
+        .toast.error{background:var(--danger)}
+        .toast.info{background:var(--primary)}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        .saved-report{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--primary);flex-wrap:wrap;gap:10px}
+        .saved-report-name{font-weight:600}
+        .saved-report-meta{font-size:12px;color:var(--text-muted)}
+        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+        .modal.active{display:flex}
+        .modal-content{background:var(--card);border-radius:12px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:15px}
+        .loading-overlay.active{display:flex}
+        .loading-overlay .spinner{width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @media(max-width:768px){.form-row{flex-direction:column}.filter-item{flex-direction:column;align-items:stretch}.filter-actions{margin-left:0;justify-content:flex-end}header{flex-direction:column;align-items:flex-start}.field-grid{grid-template-columns:1fr}.pagination{flex-direction:column;gap:8px}}
     </style>
 </head>
 <body>
@@ -350,25 +76,23 @@
     <header>
         <h1>🛠️ Конструктор отчётов</h1>
         <div class="header-actions">
-            <button class="btn btn-secondary" onclick="showSavedReports()">📁 Сохранённые</button>
-            <button class="btn" onclick="runReport()">🚀 Запустить отчёт</button>
+            <button class="btn btn-secondary" id="btnSaved">📁 Сохранённые</button>
+            <button class="btn" id="btnRun">🚀 Запустить</button>
         </div>
     </header>
-
-    <!-- Entity & Fields Selection -->
     <div class="card">
-        <div class="card-title">📦 1. Выберите сущность и поля</div>
+        <div class="card-title">📦 1. Сущность и поля</div>
         <div class="form-row">
-            <div class="form-group" style="flex:2;">
+            <div class="form-group" style="flex:2">
                 <label>Сущность</label>
-                <select id="entitySelect" onchange="onEntityChange()">
-                    <option value="">-- Выберите сущность --</option>
+                <select id="entitySelect">
+                    <option value="">-- Выберите --</option>
                     <optgroup label="Стандартные">
-                        <option value="1">🎯 Лиды (entityTypeId: 1)</option>
-                        <option value="2">💼 Сделки (entityTypeId: 2)</option>
-                        <option value="3">👥 Контакты (entityTypeId: 3)</option>
-                        <option value="4">🏢 Компании (entityTypeId: 4)</option>
-                        <option value="31">🧾 Счета (entityTypeId: 31)</option>
+                        <option value="1">🎯 Лиды</option>
+                        <option value="2">💼 Сделки</option>
+                        <option value="3">👥 Контакты</option>
+                        <option value="4">🏢 Компании</option>
+                        <option value="31">🧾 Счета</option>
                     </optgroup>
                     <optgroup label="Смарт-процессы" id="smartProcessesGroup"></optgroup>
                 </select>
@@ -377,941 +101,448 @@
                 <label>Название отчёта</label>
                 <input type="text" id="reportName" placeholder="Мой отчёт">
             </div>
-            <div class="form-group" style="flex:0;">
+            <div class="form-group" style="flex:0">
                 <label>&nbsp;</label>
-                <button class="btn btn-success" onclick="saveReportConfig()">💾 Сохранить</button>
+                <button class="btn btn-success" id="btnSave">💾 Сохранить</button>
             </div>
         </div>
-
-        <div id="fieldsSection" style="display:none;">
-            <label style="font-size:13px;font-weight:500;margin:10px 0 8px;display:block;">
-                Выберите поля для отображения <span style="color:#999;font-weight:400;">(минимум 1)</span>
-            </label>
+        <div id="fieldsSection" style="display:none">
+            <label style="font-size:13px;font-weight:500;margin:10px 0 8px;display:block">Поля <span style="color:#999">(мин. 1)</span></label>
             <div class="field-grid" id="fieldsGrid"></div>
-            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-                <button class="btn btn-sm btn-secondary" onclick="selectAllFields()">✅ Выбрать все</button>
-                <button class="btn btn-sm btn-secondary" onclick="deselectAllFields()">❌ Снять все</button>
-                <button class="btn btn-sm" onclick="selectDefaultFields()">🎯 Быстрый выбор</button>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-secondary" id="btnSelectAll">✅ Все</button>
+                <button class="btn btn-sm btn-secondary" id="btnDeselectAll">❌ Снять</button>
+                <button class="btn btn-sm" id="btnQuickSelect">🎯 Быстро</button>
             </div>
         </div>
     </div>
-
-    <!-- Filters Builder -->
-    <div class="card" id="filtersCard" style="display:none;">
-        <div class="card-title">🎛 2. Настройте фильтры</div>
+    <div class="card" id="filtersCard" style="display:none">
+        <div class="card-title">🎛 2. Фильтры</div>
         <div id="filtersContainer"></div>
-        <button class="btn btn-sm btn-secondary" onclick="addFilterRow()">➕ Добавить фильтр</button>
-        <div style="margin-top:15px;padding:10px;background:#f8f9fa;border-radius:6px;">
-            <label style="font-size:13px;font-weight:500;">Сортировка</label>
-            <div class="form-row" style="margin-top:8px;">
-                <select id="sortField" style="flex:2;">
-                    <option value="">-- Поле --</option>
-                </select>
-                <select id="sortOrder" style="flex:1;">
-                    <option value="DESC">🔽 По убыванию</option>
-                    <option value="ASC">🔼 По возрастанию</option>
-                </select>
+        <button class="btn btn-sm btn-secondary" id="btnAddFilter">➕ Фильтр</button>
+        <div style="margin-top:15px;padding:10px;background:#f8f9fa;border-radius:6px">
+            <label style="font-size:13px;font-weight:500">Сортировка</label>
+            <div class="form-row" style="margin-top:8px">
+                <select id="sortField" style="flex:2"><option value="">-- Поле --</option></select>
+                <select id="sortOrder" style="flex:1"><option value="DESC">🔽 Убыв.</option><option value="ASC">🔼 Возр.</option></select>
             </div>
         </div>
     </div>
-
-    <!-- Results -->
-    <div class="card" id="resultsCard" style="display:none;">
+    <div class="card" id="resultsCard" style="display:none">
         <div class="card-title">📊 Результаты <span id="resultsCount" class="badge"></span></div>
-        <div class="table-container">
-            <table id="resultsTable">
-                <thead id="tableHead"></thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
+        <div class="table-container"><table id="resultsTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div>
         <div class="pagination" id="pagination"></div>
-        <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn" onclick="exportToCSV()">📥 Экспорт CSV</button>
-            <button class="btn btn-secondary" onclick="toggleTableView()">👁️ Показать/скрыть</button>
+        <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" id="btnExport">📥 CSV</button>
+            <button class="btn btn-secondary" id="btnToggleTable">👁️ Скрыть/показать</button>
         </div>
     </div>
 </div>
-
-<!-- Saved Reports Modal -->
-<div id="savedModal" class="modal">
-    <div class="modal-content">
-        <div class="card" style="border-radius:0;border:none;box-shadow:none;margin:0;">
-            <div class="card-title">📁 Сохранённые отчёты</div>
-            <div id="savedReportsList"></div>
-            <div style="margin-top:15px;text-align:right;padding:0 20px 20px;">
-                <button class="btn btn-secondary" onclick="closeSavedModal()">Закрыть</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Loading Overlay -->
-<div id="loading" class="loading-overlay">
-    <div class="spinner"></div>
-    <div id="loadingText">Загрузка...</div>
-</div>
+<div id="savedModal" class="modal"><div class="modal-content"><div class="card" style="border-radius:0;border:none;box-shadow:none;margin:0"><div class="card-title">📁 Сохранённые отчёты</div><div id="savedReportsList"></div><div style="margin-top:15px;text-align:right;padding:0 20px 20px"><button class="btn btn-secondary" id="btnCloseModal">Закрыть</button></div></div></div></div>
+<div id="loading" class="loading-overlay"><div class="spinner"></div><div id="loadingText">Загрузка...</div></div>
 
 <script>
 	// ==================== КОНФИГУРАЦИЯ ====================
 	const CONFIG = {
 		portal: 'https://portal.bunter.ru',
 		webhook: '915/67la81ci3lfhp30w',
+		entities: {1:{name:'Лиды'},2:{name:'Сделки'},3:{name:'Контакты'},4:{name:'Компании'},31:{name:'Счета'}},
+		defaultFields: {1:['ID','TITLE','STATUS_ID','ASSIGNED_BY_ID','DATE_CREATE'],2:['ID','TITLE','STAGE_ID','OPPORTUNITY','ASSIGNED_BY_ID'],3:['ID','NAME','LAST_NAME','PHONE'],4:['ID','TITLE','PHONE'],31:['ID','ACCOUNT_NUMBER','PRICE','STATUS_ID']},
+		statusEntityMap: {'1':{'STATUS_ID':'LEAD_STATUS'},'2':{'STAGE_ID':'DEAL_STAGE'},'31':{'STATUS_ID':'INVOICE_STATUS'}}
+	};
 
-		entities: {
-			1: { name: 'Лиды', icon: '🎯' },
-			2: { name: 'Сделки', icon: '💼' },
-			3: { name: 'Контакты', icon: '👥' },
-			4: { name: 'Компании', icon: '🏢' },
-			31: { name: 'Счета', icon: '🧾' }
-		},
+	// ==================== СОСТОЯНИЕ ====================
+	let state = {entityTypeId:null, fields:{}, selectedFields:[], filters:[], sortField:'', sortOrder:'DESC', results:[], pagination:{page:1,pageSize:50,total:0}, statusCache:{}};
 
-		defaultFields: {
-			1: ['ID', 'TITLE', 'STATUS_ID', 'ASSIGNED_BY_ID', 'DATE_CREATE'],
-			2: ['ID', 'TITLE', 'STAGE_ID', 'OPPORTUNITY', 'ASSIGNED_BY_ID', 'CLOSED_TIME'],
-			3: ['ID', 'NAME', 'LAST_NAME', 'PHONE', 'EMAIL', 'ASSIGNED_BY_ID'],
-			4: ['ID', 'TITLE', 'PHONE', 'EMAIL', 'ASSIGNED_BY_ID'],
-			31: ['ID', 'ACCOUNT_NUMBER', 'PRICE', 'STATUS_ID', 'RESPONSIBLE_ID']
-		},
-
-		// Маппинг полей статусов к entityId для crm.status.entity.items
-		statusEntityMap: {
-			'1': { 'STATUS_ID': 'LEAD_STATUS' },
-			'2': { 'STAGE_ID': 'DEAL_STAGE' },
-			'31': { 'STATUS_ID': 'INVOICE_STATUS' }
-			// Смарт-процессы добавляются динамически: DYNAMIC_{ID}_STAGE_6
+	// ==================== УТИЛИТЫ ====================
+	function getFieldName(f, fieldId) {
+		if (!f) return String(fieldId || '');
+		const candidates = [f.title, f.name, f.id, fieldId];
+		for (const c of candidates) {
+			if (typeof c === 'string' && c.trim()) return c;
+			if (typeof c === 'object' && c && !Array.isArray(c)) {
+				const lang = c.ru || c.en || c[''] || Object.values(c)[0];
+				if (typeof lang === 'string' && lang.trim()) return lang;
+			}
 		}
-	};
+		return String(fieldId || 'unknown');
+	}
 
-	// ==================== ГЛОБАЛЬНОЕ СОСТОЯНИЕ ====================
-	let state = {
-		entityTypeId: null,
-		fields: {},
-		selectedFields: [],
-		filters: [],
-		sortField: '',
-		sortOrder: 'DESC',
-		smartProcesses: [],
-		results: [],
-		pagination: { page: 1, pageSize: 50, total: 0 },
-		statusCache: {}  // Кэш статусов: { 'entityId_fieldName': { id: {name, color, ...} } }
-	};
+	function escapeHtml(t){if(typeof t!=='string')return t;const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};return t.replace(/[&<>"']/g,x=>m[x])}
+	function escapeCsv(t){if(typeof t!=='string')return String(t);return t.replace(/"/g,'""')}
+	function formatDate(d){if(!d)return'-';return new Date(d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+	function formatMoney(a){if(!a&&a!==0)return'-';return new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',minimumFractionDigits:0}).format(a)}
+	function showLoading(t){document.getElementById('loadingText').textContent=t;document.getElementById('loading').classList.add('active')}
+	function hideLoading(){document.getElementById('loading').classList.remove('active')}
+	function showToast(msg,type='info'){const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000)}
 
 	// ==================== API ====================
-	async function apiRequest(method, params = {}) {
+	async function apiRequest(method, params={}) {
 		const url = `${CONFIG.portal}/rest/${CONFIG.webhook}/${method}`;
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(params)
-		});
-
-		if (!response.ok) {
-			const text = await response.text();
-			throw new Error(`HTTP ${response.status}: ${text}`);
-		}
-
-		const data = await response.json();
-		if (data.error) {
-			throw new Error(data.error_description || data.error);
-		}
+		const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params)});
+		if(!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+		const data = await res.json();
+		if(data.error) throw new Error(data.error_description||data.error);
 		return data;
 	}
 
-	// Загрузка смарт-процессов
+	// ==================== ЗАГРУЗКА ====================
 	async function loadSmartProcesses() {
 		try {
 			const data = await apiRequest('crm.type.list');
-			const processes = data.result || [];
-
 			const group = document.getElementById('smartProcessesGroup');
 			group.innerHTML = '';
-
-			if (processes.length > 0) {
-				processes.forEach(p => {
-					const option = document.createElement('option');
-					option.value = p.ID;
-					option.textContent = `${p.NAME || p.ID} (ID: ${p.ID})`;
-					group.appendChild(option);
-
-					// Добавляем маппинг для статусов смарт-процесса
-					CONFIG.statusEntityMap[String(p.ID)] = {
-						'STAGE_ID': `DYNAMIC_${p.ID}_STAGE_6`,
-						'STATUS_ID': `DYNAMIC_${p.ID}_STATUS`
-					};
-				});
-				state.smartProcesses = processes;
-			}
-		} catch (e) {
-			console.warn('Failed to load smart processes:', e);
-			showToast('Не удалось загрузить смарт-процессы', 'error');
-		}
+			(data.result||[]).forEach(p=>{
+				const opt = document.createElement('option');
+				opt.value = p.ID;
+				opt.textContent = `${p.NAME||p.ID} (ID:${p.ID})`;
+				group.appendChild(opt);
+				CONFIG.statusEntityMap[String(p.ID)] = {'STAGE_ID':`DYNAMIC_${p.ID}_STAGE_6`};
+			});
+		} catch(e){console.warn('Smart processes error:',e);}
 	}
 
-	// Загрузка статусов для поля
-	async function loadStatusesForField(entityTypeId, fieldName) {
-		const entityConfig = CONFIG.statusEntityMap[String(entityTypeId)];
-		if (!entityConfig?.[fieldName]) return null;
-
-		const entityId = entityConfig[fieldName];
-		const cacheKey = `${entityTypeId}_${fieldName}`;
-
-		if (state.statusCache[cacheKey]) return state.statusCache[cacheKey];
-
+	async function loadStatuses(entityTypeId, fieldName) {
+		const cfg = CONFIG.statusEntityMap[String(entityTypeId)];
+		if(!cfg?.[fieldName]) return null;
+		const key = `${entityTypeId}_${fieldName}`;
+		if(state.statusCache[key]) return state.statusCache[key];
 		try {
-			const data = await apiRequest('crm.status.entity.items', { entityId });
+			const data = await apiRequest('crm.status.entity.items', {entityId:cfg[fieldName]});
 			const statuses = {};
-
-			for (const item of (data.result || [])) {
-				const id = item.STATUS_ID || item.ID;
-				statuses[id] = {
-					name: item.NAME || item.STATUS || id,
-					color: item.COLOR || item.EXTRA?.COLOR,
-					...item
-				};
+			// ✅ ИСПРАВЛЕНО: правильный путь к статусам
+			const items = data.result || [];
+			for(const item of items) {
+				const id = item.STATUS_ID||item.ID;
+				statuses[id] = {name:getFieldName(item, id), color:item.COLOR||item.EXTRA?.COLOR};
 			}
-
-			state.statusCache[cacheKey] = statuses;
+			state.statusCache[key] = statuses;
 			return statuses;
-		} catch (e) {
-			console.warn('Failed to load statuses for', entityId, e);
-			return null;
-		}
+		} catch(e){console.warn('Status error:',e); return null;}
 	}
 
-	// Загрузка полей сущности
-	async function loadEntityFields(entityTypeId) {
+	// ✅ ИСПРАВЛЕНО: правильный путь к полям в ответе API
+	async function loadFields(entityTypeId) {
 		showLoading('Загрузка полей...');
-
 		try {
-			const data = await apiRequest('crm.item.fields', { entityTypeId: parseInt(entityTypeId) });
-			const fields = data.result || {};
+			const data = await apiRequest('crm.item.fields', {entityTypeId: parseInt(entityTypeId)});
 
-			// Фильтруем и обогащаем поля
-			const enrichedFields = {};
+			// ✅ Правильный доступ: data.result.fields, с фолбэком на data.result
+			const fields = data.result?.fields || data.result || {};
 
-			for (const [fieldId, field] of Object.entries(fields || {})) {
-				// Пропускаем неподходящие поля
-				if (!field ||
-					field.isFilterable === false ||
-					field.type === 'custom' ||
-					fieldId.startsWith('~') ||
-					field.readOnly === true) {
-					continue;
-				}
+			state.fields = {};
+			for(const [fid, f] of Object.entries(fields || {})) {
+				// Пропускаем служебные поля
+				if(!f || f.isFilterable === false || f.type === 'custom' ||
+					fid.startsWith('~') || f.readOnly === true) continue;
 
-				// Определяем является ли поле статусом
-				const isStatusField = ['stage', 'status', 'enumeration'].includes(field.type) ||
-					fieldId.toUpperCase().includes('STAGE') ||
-					fieldId.toUpperCase().includes('STATUS');
+				// Определяем статус-поля
+				const isStatus = ['stage','status','enumeration'].includes(f.type) ||
+					fid.toUpperCase().includes('STAGE') ||
+					fid.toUpperCase().includes('STATUS');
 
-				enrichedFields[fieldId] = {
-					...field,
-					isStatusField: isStatusField || false,
-					statusOptions: null
-				};
+				state.fields[fid] = {...f, isStatusField: !!isStatus, statusOptions: null};
 			}
 
-			state.fields = enrichedFields;
-
-			// Предзагружаем статусы для полей-статусов (лениво)
-			for (const [fieldId, field] of Object.entries(enrichedFields)) {
-				if (field.isStatusField) {
-					loadStatusesForField(entityTypeId, fieldId).then(statuses => {
-						if (statuses && state.fields[fieldId]) {
-							state.fields[fieldId].statusOptions = statuses;
-							updateStatusFilterInputs(fieldId, statuses);
-						}
+			// Ленивая загрузка статусов
+			for(const [fid, f] of Object.entries(state.fields)) {
+				if(f.isStatusField) {
+					loadStatuses(entityTypeId, fid).then(st => {
+						if(st && state.fields[fid]) state.fields[fid].statusOptions = st;
 					});
 				}
 			}
 
-			renderFieldsSelector();
+			renderFields();
 			renderFilterFields();
 			renderSortFields();
-
 			document.getElementById('fieldsSection').style.display = 'block';
 			document.getElementById('filtersCard').style.display = 'block';
-
-			// Авто-выбор полей по умолчанию
-			if (CONFIG.defaultFields[entityTypeId]) {
-				selectDefaultFields();
-			}
-
+			if(CONFIG.defaultFields[entityTypeId]) quickSelect();
 			hideLoading();
-		} catch (e) {
+		} catch(e) {
 			hideLoading();
-			showToast(`Ошибка загрузки полей: ${e.message}`, 'error');
-			console.error(e);
+			showToast(`Ошибка: ${e.message}`, 'error');
+			console.error('Load fields error:', e);
 		}
 	}
 
-	// ==================== РЕНДЕРИНГ ПОЛЕЙ ====================
-
-	function renderFieldsSelector() {
+	// ==================== РЕНДЕР ПОЛЕЙ ====================
+	function renderFields() {
 		const grid = document.getElementById('fieldsGrid');
 		grid.innerHTML = '';
-
-		if (!state.fields || Object.keys(state.fields).length === 0) {
-			grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px;">Нет доступных полей</div>';
-			return;
-		}
-
-		for (const [fieldId, field] of Object.entries(state.fields)) {
-			// ✅ ИСПРАВЛЕНО: безопасное получение названия
-			const fieldName = field?.title || field?.name || fieldId;
-			const fieldType = field?.type || '?';
-			const isStatus = field?.isStatusField ? ' 🎨' : '';
-
+		if(!Object.keys(state.fields).length) {grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px;">Нет полей</div>'; return;}
+		for(const [fid,f] of Object.entries(state.fields)) {
+			const fieldName = getFieldName(f, fid);
+			const fieldType = typeof f?.type === 'string' ? f.type : '?';
+			const isStatus = f?.isStatusField ? ' 🎨' : '';
 			const item = document.createElement('label');
-			item.className = `field-item${state.selectedFields.includes(fieldId) ? ' selected' : ''}`;
-			item.innerHTML = `
-            <input type="checkbox" value="${fieldId}" ${state.selectedFields.includes(fieldId) ? 'checked' : ''}
-                   onchange="toggleField('${fieldId}', this.checked)">
-            <span class="field-name" title="${fieldName}">${fieldName}${isStatus}</span>
-            <span class="field-type">${fieldType}</span>
-        `;
+			item.className = `field-item${state.selectedFields.includes(fid)?' selected':''}`;
+			item.innerHTML = `<input type="checkbox" value="${fid}" ${state.selectedFields.includes(fid)?'checked':''} data-field="${fid}">
+            <span class="field-name" title="${escapeHtml(fieldName)}">${escapeHtml(fieldName)}${isStatus}</span>
+            <span class="field-type">${escapeHtml(fieldType)}</span>`;
 			grid.appendChild(item);
 		}
-	}
-
-	function toggleField(fieldId, checked) {
-		if (checked) {
-			if (!state.selectedFields.includes(fieldId)) {
-				state.selectedFields.push(fieldId);
-			}
-		} else {
-			state.selectedFields = state.selectedFields.filter(f => f !== fieldId);
-		}
-		// Обновляем визуальное состояние
-		document.querySelectorAll('.field-item').forEach(el => {
-			const cb = el.querySelector('input');
-			el.classList.toggle('selected', cb.checked);
+		grid.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+			cb.onchange = (e)=>{
+				const fid = e.target.dataset.field;
+				if(e.target.checked){if(!state.selectedFields.includes(fid)) state.selectedFields.push(fid);}
+				else state.selectedFields = state.selectedFields.filter(x=>x!==fid);
+				e.target.closest('.field-item').classList.toggle('selected', e.target.checked);
+			};
 		});
 	}
 
-	function selectAllFields() {
-		state.selectedFields = Object.keys(state.fields);
-		renderFieldsSelector();
-	}
-
-	function deselectAllFields() {
-		state.selectedFields = [];
-		renderFieldsSelector();
-	}
-
-	function selectDefaultFields() {
-		const defaults = CONFIG.defaultFields[state.entityTypeId] || ['ID'];
-		state.selectedFields = defaults.filter(f => state.fields[f]);
-		renderFieldsSelector();
-	}
+	function selectAll(){state.selectedFields=Object.keys(state.fields); renderFields();}
+	function deselectAll(){state.selectedFields=[]; renderFields();}
+	function quickSelect(){const defs=CONFIG.defaultFields[state.entityTypeId]||['ID'];state.selectedFields=defs.filter(f=>state.fields[f]); renderFields();}
 
 	// ==================== ФИЛЬТРЫ ====================
-
 	function renderFilterFields() {
-		document.querySelectorAll('.filter-field-select').forEach(select => {
-			const currentValue = select.value;
-			select.innerHTML = '<option value="">-- Поле --</option>';
-
-			for (const [fieldId, field] of Object.entries(state.fields)) {
-				if (field && field.isFilterable !== false) {
-					const option = document.createElement('option');
-					option.value = fieldId;
-					option.textContent = field.title || field.name || fieldId;
-					option.dataset.type = field.type;
-					select.appendChild(option);
+		document.querySelectorAll('.filter-field-select').forEach(sel=>{
+			const cur = sel.value;
+			sel.innerHTML = '<option value="">-- Поле --</option>';
+			for(const [fid,f] of Object.entries(state.fields)) {
+				if(f && f.isFilterable!==false) {
+					const opt = document.createElement('option');
+					opt.value = fid;
+					opt.textContent = getFieldName(f, fid);
+					sel.appendChild(opt);
 				}
 			}
-			if (currentValue && state.fields[currentValue]) {
-				select.value = currentValue;
-			}
+			if(cur && state.fields[cur]) sel.value = cur;
 		});
 	}
 
 	function renderSortFields() {
-		const select = document.getElementById('sortField');
-		select.innerHTML = '<option value="">-- Без сортировки --</option>';
-
-		for (const [fieldId, field] of Object.entries(state.fields)) {
-			if (field && field.isFilterable !== false) {
-				const option = document.createElement('option');
-				option.value = fieldId;
-				option.textContent = field.title || field.name || fieldId;
-				select.appendChild(option);
+		const sel = document.getElementById('sortField');
+		sel.innerHTML = '<option value="">-- Без сортировки --</option>';
+		for(const [fid,f] of Object.entries(state.fields)) {
+			if(f && f.isFilterable!==false) {
+				const opt = document.createElement('option');
+				opt.value = fid;
+				opt.textContent = getFieldName(f, fid);
+				sel.appendChild(opt);
 			}
 		}
 	}
 
-	function addFilterRow(filterData = {}) {
+	function addFilterRow(data={}) {
 		const container = document.getElementById('filtersContainer');
 		const row = document.createElement('div');
 		row.className = 'filter-item';
-
-		row.innerHTML = `
-        <select class="filter-field-select" onchange="onFilterFieldChange(this)">
-            <option value="">-- Поле --</option>
-        </select>
-        <select class="filter-operator">
-            <option value="">-- Оператор --</option>
-        </select>
+		row.innerHTML = `<select class="filter-field-select"><option value="">-- Поле --</option></select>
+        <select class="filter-operator"><option value="">-- Оператор --</option></select>
         <input type="text" class="filter-value" placeholder="Значение">
-        <input type="date" class="filter-date" style="display:none;">
-        <select class="filter-status" style="display:none;min-width:150px;">
-            <option value="">-- Загрузка статусов... --</option>
-        </select>
-        <div class="filter-actions">
-            <button class="btn btn-sm btn-danger" onclick="this.closest('.filter-item').remove()">✕</button>
-        </div>
-    `;
-
+        <input type="date" class="filter-date" style="display:none">
+        <select class="filter-status" style="display:none;min-width:150px"><option value="">-- Статус --</option></select>
+        <div class="filter-actions"><button class="btn btn-sm btn-danger btn-remove">✕</button></div>`;
 		container.appendChild(row);
 		renderFilterFields();
+		const fieldSel = row.querySelector('.filter-field-select');
+		const opSel = row.querySelector('.filter-operator');
+		const txtInp = row.querySelector('.filter-value');
+		const dateInp = row.querySelector('.filter-date');
+		const statusSel = row.querySelector('.filter-status');
+		const removeBtn = row.querySelector('.btn-remove');
 
-		// Заполняем если есть данные
-		if (filterData?.field) {
-			const fieldSelect = row.querySelector('.filter-field-select');
-			fieldSelect.value = filterData.field;
-			onFilterFieldChange(fieldSelect);
-
-			if (filterData.operator) {
-				row.querySelector('.filter-operator').value = filterData.operator;
-			}
-			if (filterData.value) {
-				const valInput = row.querySelector('.filter-value');
-				const dateInput = row.querySelector('.filter-date');
-				const statusInput = row.querySelector('.filter-status');
-
-				if (statusInput?.options?.length > 1) {
-					statusInput.value = filterData.value;
-				} else if (dateInput?.style?.display !== 'none') {
-					dateInput.value = filterData.value;
-				} else {
-					valInput.value = filterData.value;
+		fieldSel.onchange = function() {
+			const fid = this.value;
+			const field = state.fields[fid];
+			if(!field) {opSel.innerHTML='<option value="">-- Оператор --</option>';txtInp.style.display='block';dateInp.style.display='none';statusSel.style.display='none';return;}
+			if(field.isStatusField) {
+				opSel.innerHTML='<option value="=">=</option><option value="!=">≠</option>';opSel.value='=';
+				txtInp.style.display='none';dateInp.style.display='none';statusSel.style.display='inline-block';
+				if(field.statusOptions) fillStatusOptions(statusSel, field.statusOptions);
+				else {
+					statusSel.innerHTML='<option>⏳ Загрузка...</option>';statusSel.disabled=true;
+					loadStatuses(state.entityTypeId, fid).then(st=>{
+						if(st){state.fields[fid].statusOptions=st;fillStatusOptions(statusSel, st);}
+						else statusSel.innerHTML='<option value="">-- Ошибка --</option>';
+						statusSel.disabled=false;
+					});
 				}
-			}
-		}
-	}
-
-	function onFilterFieldChange(select) {
-		const row = select.closest('.filter-item');
-		const fieldId = select.value;
-		const field = state.fields[fieldId];
-
-		const operatorSelect = row.querySelector('.filter-operator');
-		const textInput = row.querySelector('.filter-value');
-		const dateInput = row.querySelector('.filter-date');
-		const statusSelect = row.querySelector('.filter-status');
-
-		if (!field) {
-			operatorSelect.innerHTML = '<option value="">-- Оператор --</option>';
-			textInput.style.display = 'block';
-			dateInput.style.display = 'none';
-			statusSelect.style.display = 'none';
-			return;
-		}
-
-		// Если поле — статус
-		if (field.isStatusField) {
-			operatorSelect.innerHTML = '<option value="=">=</option><option value="!=">≠</option>';
-			operatorSelect.value = '=';
-
-			textInput.style.display = 'none';
-			dateInput.style.display = 'none';
-			statusSelect.style.display = 'inline-block';
-
-			// Если статусы уже загружены
-			if (field.statusOptions) {
-				updateStatusSelectOptions(statusSelect, field.statusOptions);
+			} else if(['date','datetime'].includes(field.type)) {
+				opSel.innerHTML = [{v:'=',l:'='},{v:'>=',l:'≥'},{v:'<=',l:'≤'},{v:'between',l:'между'}].map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
+				txtInp.style.display='none';dateInp.style.display='block';statusSel.style.display='none';
 			} else {
-				// Ленивая загрузка
-				statusSelect.innerHTML = '<option>⏳ Загрузка...</option>';
-				statusSelect.disabled = true;
-
-				loadStatusesForField(state.entityTypeId, fieldId).then(statuses => {
-					if (statuses) {
-						state.fields[fieldId].statusOptions = statuses;
-						updateStatusSelectOptions(statusSelect, statuses);
-					} else {
-						statusSelect.innerHTML = '<option value="">-- Не удалось загрузить --</option>';
-					}
-					statusSelect.disabled = false;
-				});
+				opSel.innerHTML = [{v:'=',l:'='},{v:'!=',l:'≠'},{v:'like',l:'содержит'},{v:'not like',l:'не содержит'}].map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
+				txtInp.style.display='block';dateInp.style.display='none';statusSel.style.display='none';
+			}
+		};
+		removeBtn.onclick = function(){row.remove()};
+		if(data?.field) {
+			fieldSel.value = data.field;
+			fieldSel.onchange();
+			if(data.operator) opSel.value = data.operator;
+			if(data.value) {
+				if(statusSel.options.length>1) statusSel.value=data.value;
+				else if(dateInp.style.display!=='none') dateInp.value=data.value;
+				else txtInp.value=data.value;
 			}
 		}
-		// Если дата
-		else if (['date', 'datetime'].includes(field.type)) {
-			operatorSelect.innerHTML = getOperatorsForType('date').map(op =>
-				`<option value="${op.val}">${op.label}</option>`
-			).join('');
-			textInput.style.display = 'none';
-			dateInput.style.display = 'block';
-			statusSelect.style.display = 'none';
-		}
-		// Обычное поле
-		else {
-			operatorSelect.innerHTML = getOperatorsForType(field.type).map(op =>
-				`<option value="${op.val}">${op.label}</option>`
-			).join('');
-			textInput.style.display = 'block';
-			dateInput.style.display = 'none';
-			statusSelect.style.display = 'none';
-		}
 	}
 
-	function updateStatusSelectOptions(select, statuses) {
-		select.innerHTML = '<option value="">-- Любой статус --</option>' +
-			Object.entries(statuses).map(([id, s]) =>
-				`<option value="${id}">${s.name}</option>`
-			).join('');
-	}
-
-	function updateStatusFilterInputs(fieldName, statuses) {
-		document.querySelectorAll('.filter-item').forEach(row => {
-			const fieldSelect = row.querySelector('.filter-field-select');
-			if (fieldSelect?.value === fieldName) {
-				const statusSelect = row.querySelector('.filter-status');
-				if (statusSelect && statusSelect.style.display !== 'none') {
-					updateStatusSelectOptions(statusSelect, statuses);
-				}
-			}
-		});
-	}
-
-	function getOperatorsForType(type) {
-		if (['date', 'datetime'].includes(type)) {
-			return [
-				{ val: '=', label: '=' },
-				{ val: '>=', label: '≥' },
-				{ val: '<=', label: '≤' },
-				{ val: 'between', label: 'между' }
-			];
-		}
-		if (['integer', 'double', 'money'].includes(type)) {
-			return [
-				{ val: '=', label: '=' },
-				{ val: '!=', label: '≠' },
-				{ val: '>', label: '>' },
-				{ val: '<', label: '<' },
-				{ val: '>=', label: '≥' },
-				{ val: '<=', label: '≤' }
-			];
-		}
-		return [
-			{ val: '=', label: '=' },
-			{ val: '!=', label: '≠' },
-			{ val: 'like', label: 'содержит' },
-			{ val: 'not like', label: 'не содержит' }
-		];
+	function fillStatusOptions(select, statuses) {
+		select.innerHTML = '<option value="">-- Любой --</option>' + Object.entries(statuses).map(([id,s])=>`<option value="${id}">${escapeHtml(getFieldName(s, id))}</option>`).join('');
 	}
 
 	function collectFilters() {
-		const filters = [];
-		document.querySelectorAll('.filter-item').forEach(row => {
+		const filters=[];
+		document.querySelectorAll('.filter-item').forEach(row=>{
 			const field = row.querySelector('.filter-field-select').value;
-			const operator = row.querySelector('.filter-operator').value;
-
-			// Получаем значение из нужного инпута
-			let value = row.querySelector('.filter-value')?.value ||
-				row.querySelector('.filter-date')?.value ||
-				row.querySelector('.filter-status')?.value;
-
-			if (field && operator && value) {
-				filters.push({ field, operator, value });
-			}
+			const op = row.querySelector('.filter-operator').value;
+			let val = row.querySelector('.filter-value')?.value || row.querySelector('.filter-date')?.value || row.querySelector('.filter-status')?.value;
+			if(field && op && val) filters.push({field, operator:op, value:val});
 		});
 		return filters;
 	}
 
-	// ==================== ФОРМАТИРОВАНИЕ ЗНАЧЕНИЙ ====================
-
-	function formatFieldValue(value, fieldId) {
-		const field = state.fields?.[fieldId];
-
-		// ✅ Статусы с цветными бейджами
-		if (field?.isStatusField && field?.statusOptions && value) {
-			const status = field.statusOptions[value];
-			if (status) {
-				const color = status.color || '#6c757d';
-				return `<span class="badge status-badge" style="--badge-bg:${color}20;--badge-color:${color};--badge-border:${color}40">${status.name}</span>`;
-			}
-			return `<span class="badge">${value}</span>`;
+	// ==================== ФОРМАТИРОВАНИЕ ====================
+	function formatVal(val, fid) {
+		const f = state.fields?.[fid];
+		if(f?.isStatusField && f?.statusOptions && val) {
+			const st = f.statusOptions[val];
+			if(st){const c=st.color||'#6c757d';return `<span class="badge status-badge" style="--badge-bg:${c}20;--badge-color:${c};--badge-border:${c}40">${escapeHtml(getFieldName(st, st.name||val))}</span>`;}
+			return `<span class="badge">${escapeHtml(val)}</span>`;
 		}
-
-		// Даты
-		if (field?.type === 'date' || field?.type === 'datetime') {
-			return formatDate(value);
-		}
-
-		// Деньги
-		if (field?.type === 'money' && value) {
-			return formatMoney(value);
-		}
-
-		// Булевы
-		if (field?.type === 'boolean') {
-			return value ? '✅' : '❌';
-		}
-
-		// Пользователи
-		if (field?.type === 'user' && value) {
-			return `ID: ${value}`;
-		}
-
-		// Объекты
-		if (typeof value === 'object' && value !== null) {
-			return `<span title="${escapeHtml(JSON.stringify(value))}">${escapeHtml(JSON.stringify(value).slice(0, 40))}...</span>`;
-		}
-
-		return escapeHtml(value ?? '-');
+		if(f?.type==='date'||f?.type==='datetime') return formatDate(val);
+		if(f?.type==='money'&&val) return formatMoney(val);
+		if(f?.type==='boolean') return val?'✅':'❌';
+		if(typeof val==='object'&&val!==null) return `<span title="${escapeHtml(JSON.stringify(val))}">${escapeHtml(JSON.stringify(val).slice(0,40))}...</span>`;
+		return escapeHtml(val??'-');
 	}
 
-	function escapeHtml(text) {
-		if (typeof text !== 'string') return text;
-		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-		return text.replace(/[&<>"']/g, m => map[m]);
-	}
-
-	function formatDate(dateStr) {
-		if (!dateStr) return '-';
-		return new Date(dateStr).toLocaleDateString('ru-RU', {
-			day: '2-digit', month: '2-digit', year: 'numeric',
-			hour: '2-digit', minute: '2-digit'
-		});
-	}
-
-	function formatMoney(amount) {
-		if (!amount && amount !== 0) return '-';
-		return new Intl.NumberFormat('ru-RU', {
-			style: 'currency', currency: 'RUB', minimumFractionDigits: 0
-		}).format(amount);
-	}
-
-	// ==================== ЗАПУСК ОТЧЁТА ====================
-
+	// ==================== ЗАПУСК ====================
 	async function runReport() {
-		if (!state.entityTypeId) {
-			showToast('Выберите сущность', 'error');
-			return;
-		}
-		if (state.selectedFields.length === 0) {
-			showToast('Выберите хотя бы одно поле', 'error');
-			return;
-		}
-
-		showLoading('Генерация отчёта...');
-
+		if(!state.entityTypeId){showToast('Выберите сущность','error');return;}
+		if(!state.selectedFields.length){showToast('Выберите хотя бы одно поле','error');return;}
+		showLoading('Генерация...');
 		try {
 			state.filters = collectFilters();
 			state.sortField = document.getElementById('sortField').value;
 			state.sortOrder = document.getElementById('sortOrder').value;
-
-			const params = {
-				entityTypeId: parseInt(state.entityTypeId),
-				select: [...state.selectedFields],
-				order: state.sortField ? { [state.sortField]: state.sortOrder } : undefined,
-				start: 0
-			};
-
-			if (state.filters.length > 0) {
-				params.filter = buildApiFilter(state.filters);
-			}
-
+			const params = {entityTypeId:parseInt(state.entityTypeId), select:[...state.selectedFields], order:state.sortField?{[state.sortField]:state.sortOrder}:undefined, start:0};
+			if(state.filters.length) params.filter = buildFilter(state.filters);
 			const data = await apiRequest('crm.item.list', params);
-			state.results = data.result?.items || [];
+			state.results = data.result?.items||[];
 			state.pagination.total = state.results.length;
 			state.pagination.page = 1;
-
 			renderResults();
-			document.getElementById('resultsCard').style.display = 'block';
-
-			showToast(`✅ Загружено: ${state.results.length} записей`, 'success');
-
-		} catch (e) {
-			showToast(`❌ Ошибка: ${e.message}`, 'error');
-			console.error(e);
-		} finally {
-			hideLoading();
-		}
+			document.getElementById('resultsCard').style.display='block';
+			showToast(`✅ Загружено: ${state.results.length}`,'success');
+		} catch(e){showToast(`❌ ${e.message}`,'error');console.error(e)}
+		finally{hideLoading()}
 	}
 
-	function buildApiFilter(filters) {
-		const apiFilter = {};
-
-		for (const f of filters) {
-			const { field, operator, value } = f;
-
-			if (operator === 'between') {
-				const [from, to] = value.split(',');
-				if (from) apiFilter[`>=${field}`] = from;
-				if (to) apiFilter[`<=${field}`] = to;
-			} else if (['like', 'not like'].includes(operator)) {
-				apiFilter[`%${field}`] = operator === 'like' ? value : `!${value}`;
-			} else if (operator === '!=') {
-				apiFilter[`!${field}`] = value;
-			} else {
-				apiFilter[field] = value;
-			}
+	function buildFilter(filters) {
+		const api={};
+		for(const {field,operator,value} of filters) {
+			if(operator==='between'){const [f,t]=value.split(',');if(f)api[`>=${field}`]=f;if(t)api[`<=${field}`]=t}
+			else if(['like','not like'].includes(operator)) api[`%${field}`]=operator==='like'?value:`!${value}`;
+			else if(operator==='!=') api[`!${field}`]=value;
+			else api[field]=value;
 		}
-
-		return apiFilter;
+		return api;
 	}
 
-	// ==================== ОТРИСОВКА РЕЗУЛЬТАТОВ ====================
-
+	// ==================== ОТРИСОВКА ====================
 	function renderResults() {
-		const thead = document.getElementById('tableHead');
-		const tbody = document.getElementById('tableBody');
-		const countBadge = document.getElementById('resultsCount');
-
-		// Заголовки
-		const headers = state.selectedFields.map(f => {
-			const field = state.fields[f];
-			const name = field?.title || field?.name || f;
-			return `<th data-field="${f}" onclick="onSort('${f}')">${escapeHtml(name)}</th>`;
-		}).join('');
-		thead.innerHTML = `<tr>${headers}</tr>`;
-
-		// Данные с пагинацией
-		const { page, pageSize } = state.pagination;
-		const start = (page - 1) * pageSize;
-		const pageData = state.results.slice(start, start + pageSize);
-
-		tbody.innerHTML = pageData.map(item => {
-			const cells = state.selectedFields.map(f => {
-				const val = item[f];
-				const formatted = formatFieldValue(val, f);
-				return `<td>${formatted}</td>`;
-			}).join('');
-			return `<tr>${cells}</tr>`;
-		}).join('');
-
-		// Статистика
-		countBadge.textContent = `${state.results.length} записей`;
-
+		const thead=document.getElementById('tableHead'), tbody=document.getElementById('tableBody');
+		thead.innerHTML = '<tr>'+state.selectedFields.map(f=>`<th data-field="${f}">${escapeHtml(getFieldName(state.fields[f], f))}</th>`).join('')+'</tr>';
+		thead.querySelectorAll('th').forEach(th=>{th.onclick=()=>sortTable(th.dataset.field)});
+		const {page,pageSize}=state.pagination, start=(page-1)*pageSize;
+		tbody.innerHTML = state.results.slice(start,start+pageSize).map(item=>`<tr>${state.selectedFields.map(f=>`<td>${formatVal(item[f],f)}</td>`).join('')}</tr>`).join('');
+		document.getElementById('resultsCount').textContent=`${state.results.length} записей`;
 		renderPagination();
 	}
 
 	function renderPagination() {
-		const { page, pageSize, total } = state.pagination;
-		const totalPages = Math.ceil(total / pageSize);
-		const container = document.getElementById('pagination');
-
-		if (totalPages <= 1) {
-			container.innerHTML = '';
-			return;
-		}
-
-		container.innerHTML = `
-        <button class="btn btn-sm btn-secondary" onclick="changePage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>← Назад</button>
-        <span>Страница <strong>${page}</strong> из ${totalPages}</span>
-        <button class="btn btn-sm btn-secondary" onclick="changePage(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>Вперёд →</button>
-        <select onchange="changePageSize(this.value)" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd;">
-            <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
-            <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
-            <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
-        </select>
-    `;
+		const {page,pageSize,total}=state.pagination, totalPages=Math.ceil(total/pageSize), container=document.getElementById('pagination');
+		if(totalPages<=1){container.innerHTML='';return}
+		container.innerHTML=`<button class="btn btn-sm btn-secondary" id="btnPrev">← Назад</button><span>Стр. <strong>${page}</strong> из ${totalPages}</span><button class="btn btn-sm btn-secondary" id="btnNext">Вперёд →</button><select id="selPageSize" style="padding:6px 10px;border-radius:4px;border:1px solid #ddd"><option value="25" ${pageSize===25?'selected':''}>25</option><option value="50" ${pageSize===50?'selected':''}>50</option><option value="100" ${pageSize===100?'selected':''}>100</option></select>`;
+		document.getElementById('btnPrev').onclick=()=>{if(page>1){state.pagination.page--;renderResults()}};
+		document.getElementById('btnNext').onclick=()=>{if(page<totalPages){state.pagination.page++;renderResults()}};
+		document.getElementById('selPageSize').onchange=(e)=>{state.pagination.pageSize=parseInt(e.target.value);state.pagination.page=1;renderResults()};
 	}
 
-	function changePage(newPage) {
-		state.pagination.page = newPage;
-		renderResults();
-		document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
-	}
-
-	function changePageSize(newSize) {
-		state.pagination.pageSize = parseInt(newSize);
-		state.pagination.page = 1;
-		renderResults();
-	}
-
-	function onSort(field) {
-		if (state.sortField === field) {
-			state.sortOrder = state.sortOrder === 'ASC' ? 'DESC' : 'ASC';
-		} else {
-			state.sortField = field;
-			state.sortOrder = 'ASC';
-		}
+	function sortTable(field) {
+		if(state.sortField===field) state.sortOrder=state.sortOrder==='ASC'?'DESC':'ASC';
+		else {state.sortField=field;state.sortOrder='ASC'}
 		runReport();
 	}
 
 	// ==================== ЭКСПОРТ ====================
-
-	function exportToCSV() {
-		if (state.results.length === 0) {
-			showToast('Нет данных для экспорта', 'error');
-			return;
-		}
-
-		// Заголовки
-		const headers = state.selectedFields.map(f => {
-			const field = state.fields[f];
-			return `"${escapeCsv(field?.title || field?.name || f)}"`;
-		});
-
-		// Строки
-		const rows = state.results.map(item => {
-			return state.selectedFields.map(f => {
-				let val = item[f];
-				const field = state.fields[f];
-
-				if (field?.isStatusField && field?.statusOptions && val) {
-					val = field.statusOptions[val]?.name || val;
-				} else if (field?.type === 'date' || field?.type === 'datetime') {
-					val = formatDate(val);
-				} else if (field?.type === 'money' && val) {
-					val = formatMoney(val).replace(/\s/g, ' ');
-				} else if (typeof val === 'object' && val !== null) {
-					val = JSON.stringify(val);
-				}
-
-				return `"${escapeCsv(val ?? '')}"`;
-			});
-		});
-
-		const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-		const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-
-		const link = document.createElement('a');
-		link.href = URL.createObjectURL(blob);
-		link.download = `report_${CONFIG.entities[state.entityTypeId]?.name || state.entityTypeId}_${new Date().toISOString().slice(0,10)}.csv`;
-		link.click();
-
-		showToast(`✅ Экспортировано ${state.results.length} записей`, 'success');
+	function exportCSV() {
+		if(!state.results.length){showToast('Нет данных','error');return}
+		const headers=state.selectedFields.map(f=>`"${escapeCsv(getFieldName(state.fields[f], f))}"`);
+		const rows=state.results.map(item=>state.selectedFields.map(f=>{
+			let v=item[f],fld=state.fields[f];
+			if(fld?.isStatusField&&fld?.statusOptions&&v) v=fld.statusOptions[v]?.name||v;
+			else if(fld?.type==='date'||fld?.type==='datetime') v=formatDate(v);
+			else if(fld?.type==='money'&&v) v=formatMoney(v).replace(/\s/g,' ');
+			else if(typeof v==='object'&&v!==null) v=JSON.stringify(v);
+			return `"${escapeCsv(v??'')}"`;
+		}));
+		const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+		const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+		const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+		a.download=`report_${CONFIG.entities[state.entityTypeId]?.name||state.entityTypeId}_${new Date().toISOString().slice(0,10)}.csv`;
+		a.click();showToast(`✅ Экспортировано ${state.results.length}`,'success');
 	}
 
-	function escapeCsv(text) {
-		if (typeof text !== 'string') return String(text);
-		return text.replace(/"/g, '""');
+	// ==================== СОХРАНЕНИЕ ====================
+	function saveConfig() {
+		const name=document.getElementById('reportName').value.trim()||`Отчёт ${new Date().toLocaleDateString()}`;
+		const cfg={id:Date.now(),name,entityTypeId:state.entityTypeId,selectedFields:[...state.selectedFields],filters:collectFilters(),sortField:state.sortField,sortOrder:state.sortOrder,createdAt:new Date().toISOString()};
+		const saved=JSON.parse(localStorage.getItem('bunter_reports')||'[]');
+		saved.push(cfg);localStorage.setItem('bunter_reports',JSON.stringify(saved));
+		showToast(`✅ "${name}" сохранён`,'success');
 	}
 
-	// ==================== УТИЛИТЫ ====================
-
-	function showLoading(text) {
-		document.getElementById('loadingText').textContent = text;
-		document.getElementById('loading').classList.add('active');
-	}
-
-	function hideLoading() {
-		document.getElementById('loading').classList.remove('active');
-	}
-
-	function showToast(message, type = 'info') {
-		const toast = document.createElement('div');
-		toast.className = `toast ${type}`;
-		toast.textContent = message;
-		document.body.appendChild(toast);
-		setTimeout(() => toast.remove(), 3000);
-	}
-
-	function toggleTableView() {
-		const table = document.getElementById('resultsTable');
-		table.closest('.table-container').style.display =
-			table.closest('.table-container').style.display === 'none' ? 'block' : 'none';
-	}
-
-	// ==================== СОХРАНЕНИЕ ОТЧЁТОВ ====================
-
-	function saveReportConfig() {
-		const name = document.getElementById('reportName').value.trim() || `Отчёт ${new Date().toLocaleDateString()}`;
-
-		const config = {
-			id: Date.now(),
-			name,
-			entityTypeId: state.entityTypeId,
-			selectedFields: [...state.selectedFields],
-			filters: collectFilters(),
-			sortField: state.sortField,
-			sortOrder: state.sortOrder,
-			createdAt: new Date().toISOString()
-		};
-
-		const saved = JSON.parse(localStorage.getItem('bunter_reports') || '[]');
-		saved.push(config);
-		localStorage.setItem('bunter_reports', JSON.stringify(saved));
-
-		showToast(`✅ Отчёт "${name}" сохранён`, 'success');
-	}
-
-	function showSavedReports() {
-		const saved = JSON.parse(localStorage.getItem('bunter_reports') || '[]');
-		const list = document.getElementById('savedReportsList');
-
-		if (saved.length === 0) {
-			list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Нет сохранённых отчётов</p></div>';
-		} else {
-			list.innerHTML = saved.map(r => `
-            <div class="saved-report">
-                <div>
-                    <div class="saved-report-name">${escapeHtml(r.name)}</div>
-                    <div class="saved-report-meta">
-                        ${CONFIG.entities[r.entityTypeId]?.name || `Entity ${r.entityTypeId}`} •
-                        ${new Date(r.createdAt).toLocaleDateString('ru-RU')}
-                    </div>
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn btn-sm" onclick="loadReportConfig(${r.id})">▶️ Запустить</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteReport(${r.id})">🗑️</button>
-                </div>
-            </div>
-        `).join('');
-		}
-
+	function showSaved() {
+		const saved=JSON.parse(localStorage.getItem('bunter_reports')||'[]'), list=document.getElementById('savedReportsList');
+		if(!saved.length) list.innerHTML='<div class="empty-state"><div class="empty-state-icon">📭</div><p>Нет сохранённых</p></div>';
+		else list.innerHTML=saved.map(r=>`<div class="saved-report"><div><div class="saved-report-name">${escapeHtml(r.name)}</div><div class="saved-report-meta">${CONFIG.entities[r.entityTypeId]?.name||`Entity ${r.entityTypeId}`} • ${new Date(r.createdAt).toLocaleDateString('ru-RU')}</div></div><div style="display:flex;gap:8px"><button class="btn btn-sm" data-load="${r.id}">▶️</button><button class="btn btn-sm btn-danger" data-del="${r.id}">🗑️</button></div></div>`).join('');
+		list.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>loadConfig(parseInt(b.dataset.load)));
+		list.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Удалить?')){let s=JSON.parse(localStorage.getItem('bunter_reports')||'[]');s=s.filter(x=>x.id!==parseInt(b.dataset.del));localStorage.setItem('bunter_reports',JSON.stringify(s));showSaved();showToast('✅ Удалён','success')}});
 		document.getElementById('savedModal').classList.add('active');
 	}
-
-	function closeSavedModal() {
-		document.getElementById('savedModal').classList.remove('active');
-	}
-
-	function loadReportConfig(id) {
-		const saved = JSON.parse(localStorage.getItem('bunter_reports') || '[]');
-		const config = saved.find(r => r.id === id);
-		if (!config) return;
-
-		document.getElementById('entitySelect').value = config.entityTypeId;
-		document.getElementById('reportName').value = config.name;
-
-		state.entityTypeId = config.entityTypeId;
-		state.selectedFields = config.selectedFields;
-		state.filters = config.filters || [];
-		state.sortField = config.sortField || '';
-		state.sortOrder = config.sortOrder || 'DESC';
-
-		loadEntityFields(config.entityTypeId).then(() => {
-			document.getElementById('filtersContainer').innerHTML = '';
-			(config.filters || []).forEach(f => addFilterRow(f));
-
-			document.getElementById('sortField').value = config.sortField || '';
-			document.getElementById('sortOrder').value = config.sortOrder || 'DESC';
-
+	function closeSaved(){document.getElementById('savedModal').classList.remove('active')}
+	function loadConfig(id) {
+		const saved=JSON.parse(localStorage.getItem('bunter_reports')||'[]'), cfg=saved.find(r=>r.id===id);
+		if(!cfg)return;
+		document.getElementById('entitySelect').value=cfg.entityTypeId;
+		document.getElementById('reportName').value=cfg.name;
+		state.entityTypeId=cfg.entityTypeId;state.selectedFields=cfg.selectedFields;state.filters=cfg.filters||[];state.sortField=cfg.sortField||'';state.sortOrder=cfg.sortOrder||'DESC';
+		loadFields(cfg.entityTypeId).then(()=>{
+			document.getElementById('filtersContainer').innerHTML='';
+			(cfg.filters||[]).forEach(f=>addFilterRow(f));
+			document.getElementById('sortField').value=cfg.sortField||'';document.getElementById('sortOrder').value=cfg.sortOrder||'DESC';
 			runReport();
 		});
-
-		closeSavedModal();
+		closeSaved();
 	}
 
-	function deleteReport(id) {
-		if (!confirm('Удалить этот отчёт?')) return;
-
-		let saved = JSON.parse(localStorage.getItem('bunter_reports') || '[]');
-		saved = saved.filter(r => r.id !== id);
-		localStorage.setItem('bunter_reports', JSON.stringify(saved));
-
-		showSavedReports();
-		showToast('✅ Отчёт удалён', 'success');
-	}
-
-	// Закрытие модального окна
-	document.getElementById('savedModal').addEventListener('click', (e) => {
-		if (e.target.id === 'savedModal') closeSavedModal();
-	});
+	function toggleTable(){const c=document.getElementById('resultsTable').closest('.table-container');c.style.display=c.style.display==='none'?'block':'none'}
 
 	// ==================== ИНИЦИАЛИЗАЦИЯ ====================
+	function initEvents() {
+		document.getElementById('btnRun').onclick=runReport;
+		document.getElementById('btnSaved').onclick=showSaved;
+		document.getElementById('btnCloseModal').onclick=closeSaved;
+		document.getElementById('savedModal').onclick=(e)=>{if(e.target.id==='savedModal')closeSaved()};
+		document.getElementById('entitySelect').onchange=function(){const et=this.value;if(!et)return;state.entityTypeId=et;state.selectedFields=[];state.filters=[];state.results=[];document.getElementById('resultsCard').style.display='none';document.getElementById('filtersContainer').innerHTML='';addFilterRow();loadFields(et)};
+		document.getElementById('btnSelectAll').onclick=selectAll;
+		document.getElementById('btnDeselectAll').onclick=deselectAll;
+		document.getElementById('btnQuickSelect').onclick=quickSelect;
+		document.getElementById('btnSave').onclick=saveConfig;
+		document.getElementById('btnAddFilter').onclick=()=>addFilterRow();
+		document.getElementById('btnExport').onclick=exportCSV;
+		document.getElementById('btnToggleTable').onclick=toggleTable;
+	}
 
-	document.addEventListener('DOMContentLoaded', () => {
-		loadSmartProcesses();
-		addFilterRow();
-	});
+	document.addEventListener('DOMContentLoaded', ()=>{loadSmartProcesses();addFilterRow();initEvents()});
 </script>
 </body>
 </html>
