@@ -187,19 +187,39 @@
 	}
 
 	// ==================== ЗАГРУЗКА ====================
+	// ✅ ИСПРАВЛЕНО: правильная обработка ответа crm.type.list
 	async function loadSmartProcesses() {
 		try {
 			const data = await apiRequest('crm.type.list');
+
+			// ✅ Правильный путь: result.types, с фолбэками
+			const processes = data.result?.types || data.result || [];
+
 			const group = document.getElementById('smartProcessesGroup');
 			group.innerHTML = '';
-			(data.result||[]).forEach(p=>{
-				const opt = document.createElement('option');
-				opt.value = p.ID;
-				opt.textContent = `${p.NAME||p.ID} (ID:${p.ID})`;
-				group.appendChild(opt);
-				CONFIG.statusEntityMap[String(p.ID)] = {'STAGE_ID':`DYNAMIC_${p.ID}_STAGE_6`};
-			});
-		} catch(e){console.warn('Smart processes error:',e);}
+
+			if (processes.length > 0) {
+				processes.forEach(p => {
+					// ✅ Нормализация ID: может быть id, ID или entityTypeId
+					const pid = String(p.id || p.ID || p.entityTypeId);
+					const pname = p.title || p.name || `Smart Process #${pid}`;
+
+					const opt = document.createElement('option');
+					opt.value = pid;
+					opt.textContent = `${pname} (ID: ${pid})`;
+					group.appendChild(opt);
+
+					// ✅ Маппинг для статусов смарт-процесса
+					CONFIG.statusEntityMap[pid] = {
+						'STAGE_ID': `DYNAMIC_${pid}_STAGE_6`,
+						'STATUS_ID': `DYNAMIC_${pid}_STATUS`
+					};
+				});
+			}
+		} catch(e) {
+			console.warn('Smart processes load error:', e);
+			showToast('Не удалось загрузить смарт-процессы', 'error');
+		}
 	}
 
 	async function loadStatuses(entityTypeId, fieldName) {
@@ -210,7 +230,6 @@
 		try {
 			const data = await apiRequest('crm.status.entity.items', {entityId:cfg[fieldName]});
 			const statuses = {};
-			// ✅ ИСПРАВЛЕНО: правильный путь к статусам
 			const items = data.result || [];
 			for(const item of items) {
 				const id = item.STATUS_ID||item.ID;
@@ -221,30 +240,21 @@
 		} catch(e){console.warn('Status error:',e); return null;}
 	}
 
-	// ✅ ИСПРАВЛЕНО: правильный путь к полям в ответе API
 	async function loadFields(entityTypeId) {
 		showLoading('Загрузка полей...');
 		try {
 			const data = await apiRequest('crm.item.fields', {entityTypeId: parseInt(entityTypeId)});
-
-			// ✅ Правильный доступ: data.result.fields, с фолбэком на data.result
 			const fields = data.result?.fields || data.result || {};
 
 			state.fields = {};
 			for(const [fid, f] of Object.entries(fields || {})) {
-				// Пропускаем служебные поля
 				if(!f || f.isFilterable === false || f.type === 'custom' ||
 					fid.startsWith('~') || f.readOnly === true) continue;
-
-				// Определяем статус-поля
 				const isStatus = ['stage','status','enumeration'].includes(f.type) ||
 					fid.toUpperCase().includes('STAGE') ||
 					fid.toUpperCase().includes('STATUS');
-
 				state.fields[fid] = {...f, isStatusField: !!isStatus, statusOptions: null};
 			}
-
-			// Ленивая загрузка статусов
 			for(const [fid, f] of Object.entries(state.fields)) {
 				if(f.isStatusField) {
 					loadStatuses(entityTypeId, fid).then(st => {
@@ -252,7 +262,6 @@
 					});
 				}
 			}
-
 			renderFields();
 			renderFilterFields();
 			renderSortFields();
