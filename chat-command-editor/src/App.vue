@@ -318,6 +318,11 @@ onMounted(() => {
   width: 100vw;
   font-family: Arial, sans-serif;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .sidebar {
@@ -328,6 +333,7 @@ onMounted(() => {
   padding: 20px;
   transition: all 0.3s ease;
   position: relative;
+  z-index: 10;
 }
 
 .sidebar.collapsed {
@@ -550,13 +556,13 @@ textarea:focus {
   width: 100%;
 }
 
-/* Hide BaseEdge component - we use edges from VueFlow */
+/* Edge styles with arrows */
 :deep(.vue-flow__edge-path) {
   stroke: #666;
   stroke-width: 2;
 }
 
-:deep(.vue-flow__edge-text) {
-  font-size: 10px;
+:deep(.vue-flow__arrowhead) {
+  fill: #666;
 }
 </style>

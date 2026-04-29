@@ -1,1 +1,34 @@
-Nothing should be ignored in this case, as the only modified file is a source code file (.vue) without any build artifacts, dependencies, or temporary files in the changes.
+```
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.min.js
+*.min.css
+*.bundle.js
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.env
+```
