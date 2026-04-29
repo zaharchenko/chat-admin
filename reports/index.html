@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор отчетов Bitrix24</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .config-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .config-section h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background: #2fc6f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1aa3d1;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background: #2fc6f6;
+        }
+        .btn-success {
+            background: #9dc15b;
+        }
+        .btn-success:hover {
+            background: #7da34a;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+        .entity-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .fields-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .entity-list {
+            list-style: none;
+        }
+        .entity-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .entity-item:hover {
+            background: #e9ecef;
+        }
+        .entity-item.selected {
+            border-color: #2fc6f6;
+            background: #e8f4f8;
+        }
+        .entity-item.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .fields-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .field-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .field-checkbox:hover {
+            background: #e9ecef;
+        }
+        .field-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        .field-label {
+            flex: 1;
+            font-size: 14px;
+        }
+        .field-code {
+            font-size: 12px;
+            color: #999;
+            margin-left: 10px;
+        }
+        .report-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2fc6f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .smart-processes {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .smart-process-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #fff3cd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .smart-process-item.selected {
+            background: #ffe69c;
+            border: 2px solid #ffc107;
+        }
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 Конструктор отчетов Bitrix24</h1>
+    <div class="config-section">
+        <h2>🔐 Настройки подключения</h2>
+        <div class="form-group">
+            <label for="portalUrl">URL портала:</label>
+            <input type="text" id="portalUrl" value="https://portal.bunter.ru" placeholder="https://your-portal.bitrix24.ru">
+        </div>
+        <div class="form-group">
+            <label for="webhookUrl">Вебхук (остальная часть после домена):</label>
+            <input type="text" id="webhookUrl" value="/rest/915/67la81ci3lfhp30w/" placeholder="/rest/USER_ID/CODE/">
+        </div>
+        <button onclick="testConnection()" class="btn-primary">Проверить подключение</button>
+        <div id="connectionStatus"></div>
+    </div>
+    <div class="main-content">
+        <div class="entity-panel">
+            <h2>📁 Выберите сущность</h2>
+            <ul class="entity-list" id="entityList">
+                <li class="entity-item" data-type="2" data-name="Сделки">
+                    💼 Сделки
+                </li>
+                <li class="entity-item" data-type="1" data-name="Лиды">
+                    🎯 Лиды
+                </li>
+                <li class="entity-item" data-type="3" data-name="Контакты">
+                    👤 Контакты
+                </li>
+                <li class="entity-item" data-type="4" data-name="Компании">
+                    🏢 Компании
+                </li>
+                <li class="entity-item" data-type="31" data-name="Счета">
+                    📄 Счета
+                </li>
+            </ul>
+            <div class="smart-processes">
+                <h3>⚙️ Смарт-процессы</h3>
+                <button onclick="loadSmartProcesses()" class="btn-primary" style="margin-bottom: 10px;">Загрузить смарт-процессы</button>
+                <div id="smartProcessesList"></div>
+            </div>
+        </div>
+        <div class="fields-panel">
+            <h2>🔧 Выберите поля для отчета</h2>
+            <div id="selectedEntity" style="margin-bottom: 15px; color: #666;">
+                Выберите сущность слева
+            </div>
+            <div id="fieldsContainer" class="fields-container"></div>
+            <div class="actions">
+                <button onclick="generateReport()" class="btn-success" id="generateBtn" disabled>
+                    📊 Сформировать отчет
+                </button>
+                <button onclick="exportToCSV()" class="btn-primary" id="exportBtn" disabled>
+                    💾 Экспорт в CSV
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="report-preview" id="reportPreview" style="display: none;">
+        <h2>📈 Предварительный просмотр отчета</h2>
+        <div id="reportContent"></div>
+    </div>
+</div>
+<script>
+	// Глобальные переменные
+	let currentEntityType = null;
+	let availableFields = [];
+	let selectedFields = [];
+	let reportData = [];
+	let smartProcesses = [];
+	// Стандартные сущности
+	const standardEntities = {
+		1: 'Лиды',
+		2: 'Сделки',
+		3: 'Контакты',
+		4: 'Компании',
+		31: 'Счета'
+	};
+	// Инициализация
+	document.addEventListener('DOMContentLoaded', function() {
+		initEntitySelection();
+	});
+	// Инициализация выбора сущностей
+	function initEntitySelection() {
+		const entityItems = document.querySelectorAll('.entity-item');
+		entityItems.forEach(item => {
+			item.addEventListener('click', function() {
+				selectEntity(this);
+			});
+		});
+	}
+	// Выбор сущности
+	function selectEntity(element) {
+		// Снимаем выделение со всех
+		document.querySelectorAll('.entity-item').forEach(item => {
+			item.classList.remove('selected');
+		});
+		document.querySelectorAll('.smart-process-item').forEach(item => {
+			item.classList.remove('selected');
+		});
+		// Выделяем текущий
+		element.classList.add('selected');
+		// Получаем тип сущности
+		currentEntityType = element.dataset.type;
+		const entityName = element.dataset.name;
+		document.getElementById('selectedEntity').textContent = `Выбрана сущность: ${entityName}`;
+		// Загружаем поля
+		loadEntityFields(currentEntityType);
+	}
+	// Загрузка полей сущности
+	async function loadEntityFields(entityTypeId) {
+		const container = document.getElementById('fieldsContainer');
+		container.innerHTML = '<div class="loading-spinner"></div> Загрузка полей...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.item.fields?entityTypeId=${entityTypeId}`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result) {
+				availableFields = result.result;
+				renderFields(availableFields);
+			} else {
+				container.innerHTML = '<div class="status-message error">Ошибка загрузки полей</div>';
+			}
+		} catch (error) {
+			container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
+		}
+	}
+	// Отображение полей
+	function renderFields(fields) {
+		const container = document.getElementById('fieldsContainer');
+		container.innerHTML = '';
+		// Сортируем поля: сначала стандартные, потом пользовательские
+		const sortedFields = Object.entries(fields).sort((a, b) => {
+			const aIsCustom = a[0].startsWith('UF_');
+			const bIsCustom = b[0].startsWith('UF_');
+			if (aIsCustom && !bIsCustom) return 1;
+			if (!aIsCustom && bIsCustom) return -1;
+			return a[1].title.localeCompare(b[1].title);
+		});
+		sortedFields.forEach(([code, field]) => {
+			const checkboxDiv = document.createElement('div');
+			checkboxDiv.className = 'field-checkbox';
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.id = `field_${code}`;
+			checkbox.value = code;
+			checkbox.addEventListener('change', handleFieldSelection);
+			const label = document.createElement('span');
+			label.className = 'field-label';
+			label.textContent = field.title || code;
+			const codeSpan = document.createElement('span');
+			codeSpan.className = 'field-code';
+			codeSpan.textContent = `[${code}]`;
+			checkboxDiv.appendChild(checkbox);
+			checkboxDiv.appendChild(label);
+			checkboxDiv.appendChild(codeSpan);
+			container.appendChild(checkboxDiv);
+		});
+	}
+	// Обработка выбора поля
+	function handleFieldSelection(event) {
+		const fieldCode = event.target.value;
+		const isChecked = event.target.checked;
+		if (isChecked) {
+			selectedFields.push(fieldCode);
+		} else {
+			selectedFields = selectedFields.filter(f => f !== fieldCode);
+		}
+		updateButtons();
+	}
+	// Обновление состояния кнопок
+	function updateButtons() {
+		const generateBtn = document.getElementById('generateBtn');
+		const exportBtn = document.getElementById('exportBtn');
+		generateBtn.disabled = selectedFields.length === 0;
+		exportBtn.disabled = reportData.length === 0;
+	}
+	// Загрузка смарт-процессов
+	async function loadSmartProcesses() {
+		const container = document.getElementById('smartProcessesList');
+		container.innerHTML = '<div class="loading-spinner"></div> Загрузка...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.type.list`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result) {
+				smartProcesses = result.result;
+				renderSmartProcesses(smartProcesses);
+			} else {
+				container.innerHTML = '<div class="status-message error">Нет смарт-процессов</div>';
+			}
+		} catch (error) {
+			container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
+		}
+	}
+	// Отображение смарт-процессов
+	function renderSmartProcesses(processes) {
+		const container = document.getElementById('smartProcessesList');
+		container.innerHTML = '';
+		processes.forEach(process => {
+			const div = document.createElement('div');
+			div.className = 'smart-process-item';
+			div.dataset.type = process.TYPE_ID;
+			div.dataset.name = process.NAME;
+			div.textContent = `📋 ${process.NAME}`;
+			div.addEventListener('click', function() {
+				selectEntity(this);
+			});
+			container.appendChild(div);
+		});
+	}
+	// Генерация отчета
+	async function generateReport() {
+		if (selectedFields.length === 0) {
+			alert('Выберите хотя бы одно поле');
+			return;
+		}
+		const preview = document.getElementById('reportPreview');
+		const content = document.getElementById('reportContent');
+		preview.style.display = 'block';
+		content.innerHTML = '<div class="loading-spinner"></div> Загрузка данных...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.item.list?entityTypeId=${currentEntityType}`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result && result.result.items) {
+				reportData = result.result.items;
+				renderReport(reportData, selectedFields);
+				updateButtons();
+			} else {
+				content.innerHTML = '<div class="status-message error">Нет данных</div>';
+			}
+		} catch (error) {
+			content.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
+		}
+	}
+	// Отображение отчета
+	function renderReport(data, fields) {
+		const content = document.getElementById('reportContent');
+		if (data.length === 0) {
+			content.innerHTML = '<div class="no-data">Нет данных для отображения</div>';
+			return;
+		}
+		// Получаем информацию о полях
+		const fieldInfo = {};
+		fields.forEach(code => {
+			if (availableFields[code]) {
+				fieldInfo[code] = availableFields[code];
+			}
+		});
+		// Создаем таблицу
+		let html = '<table><thead><tr>';
+		// Заголовки
+		fields.forEach(code => {
+			const title = fieldInfo[code] ? fieldInfo[code].title : code;
+			html += `<th>${title}</th>`;
+		});
+		html += '</tr></thead><tbody>';
+		// Данные
+		data.forEach(item => {
+			html += '<tr>';
+			fields.forEach(code => {
+				const value = getValueFromItem(item, code);
+				html += `<td>${value}</td>`;
+			});
+			html += '</tr>';
+		});
+		html += '</tbody></table>';
+		content.innerHTML = html;
+	}
+	// Получение значения из элемента
+	function getValueFromItem(item, code) {
+		let value = item[code];
+		if (value === null || value === undefined) {
+			return '-';
+		}
+		// Обработка сложных значений
+		if (typeof value === 'object') {
+			if (Array.isArray(value)) {
+				return value.map(v => {
+					if (typeof v === 'object' && v !== null) {
+						return v.NAME || v.toString();
+					}
+					return v;
+				}).join(', ');
+			}
+			return value.NAME || value.toString();
+		}
+		return value;
+	}
+	// Экспорт в CSV
+	function exportToCSV() {
+		if (reportData.length === 0) {
+			alert('Нет данных для экспорта');
+			return;
+		}
+		// Получаем информацию о полях
+		const fieldInfo = {};
+		selectedFields.forEach(code => {
+			if (availableFields[code]) {
+				fieldInfo[code] = availableFields[code];
+			}
+		});
+		// Создаем CSV
+		let csv = '\uFEFF'; // BOM для UTF-8
+		// Заголовки
+		csv += selectedFields.map(code => {
+			const title = fieldInfo[code] ? fieldInfo[code].title : code;
+			return `"${title}"`;
+		}).join(';') + '\n';
+		// Данные
+		reportData.forEach(item => {
+			const row = selectedFields.map(code => {
+				let value = getValueFromItem(item, code);
+				// Экранирование кавычек
+				value = String(value).replace(/"/g, '""');
+				return `"${value}"`;
+			}).join(';');
+			csv += row + '\n';
+		});
+		// Скачивание файла
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const link = document.createElement('a');
+		const url = URL.createObjectURL(blob);
+		link.setAttribute('href', url);
+		link.setAttribute('download', `report_${new Date().toISOString().slice(0,10)}.csv`);
+		link.style.visibility = 'hidden';
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+	// Тест подключения
+	async function testConnection() {
+		const statusDiv = document.getElementById('connectionStatus');
+		statusDiv.innerHTML = '<div class="loading-spinner"></div> Проверка...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.item.fields?entityTypeId=2`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result) {
+				statusDiv.innerHTML = '<div class="status-message success">✅ Подключение успешно!</div>';
+			} else {
+				statusDiv.innerHTML = '<div class="status-message error">❌ Ошибка подключения</div>';
+			}
+		} catch (error) {
+			statusDiv.innerHTML = `<div class="status-message error">❌ Ошибка: ${error.message}</div>`;
+		}
+	}
+</script>
+</body>
+</html>
