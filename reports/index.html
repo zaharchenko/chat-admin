@@ -315,6 +315,114 @@
 	};
 	
 	// Делаем функции доступными глобально для onclick обработчиков
+	async function testConnection() {
+		const statusDiv = document.getElementById('connectionStatus');
+		statusDiv.innerHTML = '<div class="loading-spinner"></div> Проверка...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.item.fields?entityTypeId=2`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result) {
+				statusDiv.innerHTML = '<div class="status-message success">✅ Подключение успешно!</div>';
+			} else {
+				statusDiv.innerHTML = '<div class="status-message error">❌ Ошибка подключения</div>';
+			}
+		} catch (error) {
+			statusDiv.innerHTML = `<div class="status-message error">❌ Ошибка: ${error.message}</div>`;
+		}
+	}
+	
+	async function loadSmartProcesses() {
+		const container = document.getElementById('smartProcessesList');
+		container.innerHTML = '<div class="loading-spinner"></div> Загрузка...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.type.list`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result) {
+				// Обрабатываем результат - он может быть объектом или массивом
+				smartProcesses = Array.isArray(result.result) ? result.result : (result.result.types || []);
+				renderSmartProcesses(smartProcesses);
+			} else {
+				container.innerHTML = '<div class="status-message error">Нет смарт-процессов</div>';
+			}
+		} catch (error) {
+			container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
+		}
+	}
+	
+	async function generateReport() {
+		if (selectedFields.length === 0) {
+			alert('Выберите хотя бы одно поле');
+			return;
+		}
+		const preview = document.getElementById('reportPreview');
+		const content = document.getElementById('reportContent');
+		preview.style.display = 'block';
+		content.innerHTML = '<div class="loading-spinner"></div> Загрузка данных...';
+		try {
+			const portalUrl = document.getElementById('portalUrl').value;
+			const webhookUrl = document.getElementById('webhookUrl').value;
+			const fullUrl = `${portalUrl}${webhookUrl}crm.item.list?entityTypeId=${currentEntityType}`;
+			const response = await fetch(fullUrl);
+			const result = await response.json();
+			if (result.result && result.result.items) {
+				reportData = result.result.items;
+				renderReport(reportData, selectedFields);
+				updateButtons();
+			} else {
+				content.innerHTML = '<div class="status-message error">Нет данных</div>';
+			}
+		} catch (error) {
+			content.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
+		}
+	}
+	
+	function exportToCSV() {
+		if (reportData.length === 0) {
+			alert('Нет данных для экспорта');
+			return;
+		}
+		// Получаем информацию о полях
+		const fieldInfo = {};
+		selectedFields.forEach(code => {
+			if (availableFields[code]) {
+				fieldInfo[code] = availableFields[code];
+			}
+		});
+		// Создаем CSV
+		let csv = '\uFEFF'; // BOM для UTF-8
+		// Заголовки
+		csv += selectedFields.map(code => {
+			const title = fieldInfo[code] ? fieldInfo[code].title : code;
+			return `"${title}"`;
+		}).join(';') + '\n';
+		// Данные
+		reportData.forEach(item => {
+			const row = selectedFields.map(code => {
+				let value = getValueFromItem(item, code);
+				// Экранирование кавычек
+				value = String(value).replace(/"/g, '""');
+				return `"${value}"`;
+			}).join(';');
+			csv += row + '\n';
+		});
+		// Скачивание файла
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const link = document.createElement('a');
+		const url = URL.createObjectURL(blob);
+		link.setAttribute('href', url);
+		link.setAttribute('download', `report_${new Date().toISOString().slice(0,10)}.csv`);
+		link.style.visibility = 'hidden';
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+	
 	window.testConnection = testConnection;
 	window.loadSmartProcesses = loadSmartProcesses;
 	window.generateReport = generateReport;
@@ -360,6 +468,7 @@
 			const fullUrl = `${portalUrl}${webhookUrl}crm.item.fields?entityTypeId=${entityTypeId}`;
 			const response = await fetch(fullUrl);
 			const result = await response.json();
+			
 			if (result.result) {
 				availableFields = result.result;
 				console.log("Загруженные поля:", availableFields);
@@ -371,21 +480,27 @@
 			container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
 		}
 	}
+	
 	// Отображение полей
 	function renderFields(fields) {
 		const container = document.getElementById('fieldsContainer');
 		container.innerHTML = '';
+		
+		if (!fields || typeof fields !== 'object') {
+			container.innerHTML = '<div class="status-message error">Нет доступных полей</div>';
+			return;
+		}
+		
 		// Сортируем поля: сначала стандартные, потом пользовательские
 		let sortedFields = [];
-		if (fields) {
-			sortedFields = Object.entries(fields).sort((a, b) => {
-				const aIsCustom = a[0].startsWith('UF_');
-				const bIsCustom = b[0].startsWith('UF_');
-				if (aIsCustom && !bIsCustom) return 1;
-				if (!aIsCustom && bIsCustom) return -1;
-				return a[1].title.localeCompare(b[1].title);
-			});
-		}
+		sortedFields = Object.entries(fields).sort((a, b) => {
+			const aIsCustom = a[0].startsWith('UF_');
+			const bIsCustom = b[0].startsWith('UF_');
+			if (aIsCustom && !bIsCustom) return 1;
+			if (!aIsCustom && bIsCustom) return -1;
+			return (a[1] && a[1].title ? a[1].title : a[0]).localeCompare(b[1] && b[1].title ? b[1].title : b[0]);
+		});
+		
 		sortedFields.forEach(([code, field]) => {
 			const checkboxDiv = document.createElement('div');
 			checkboxDiv.className = 'field-checkbox';
@@ -424,30 +539,25 @@
 		generateBtn.disabled = selectedFields.length === 0;
 		exportBtn.disabled = reportData.length === 0;
 	}
-	// Загрузка смарт-процессов
-	async function loadSmartProcesses() {
-		const container = document.getElementById('smartProcessesList');
-		container.innerHTML = '<div class="loading-spinner"></div> Загрузка...';
-		try {
-			const portalUrl = document.getElementById('portalUrl').value;
-			const webhookUrl = document.getElementById('webhookUrl').value;
-			const fullUrl = `${portalUrl}${webhookUrl}crm.type.list`;
-			const response = await fetch(fullUrl);
-			const result = await response.json();
-			if (result.result) {
-				smartProcesses = result.result;
-				renderSmartProcesses(smartProcesses);
-			} else {
-				container.innerHTML = '<div class="status-message error">Нет смарт-процессов</div>';
-			}
-		} catch (error) {
-			container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
-		}
+	// Обновление состояния кнопок
+	function updateButtons() {
+		const generateBtn = document.getElementById('generateBtn');
+		const exportBtn = document.getElementById('exportBtn');
+		generateBtn.disabled = selectedFields.length === 0;
+		exportBtn.disabled = reportData.length === 0;
 	}
+	
 	// Отображение смарт-процессов
 	function renderSmartProcesses(processes) {
 		const container = document.getElementById('smartProcessesList');
 		container.innerHTML = '';
+		
+		// Проверяем, что processes - это массив
+		if (!processes || !Array.isArray(processes)) {
+			container.innerHTML = '<div class="status-message error">Нет смарт-процессов</div>';
+			return;
+		}
+		
 		processes.forEach(process => {
 			const div = document.createElement('div');
 			div.className = 'smart-process-item';
@@ -521,6 +631,7 @@
 		html += '</tbody></table>';
 		content.innerHTML = html;
 	}
+	
 	// Получение значения из элемента
 	function getValueFromItem(item, code) {
 		let value = item[code];
@@ -541,6 +652,7 @@
 		}
 		return value;
 	}
+	
 	// Экспорт в CSV
 	function exportToCSV() {
 		if (reportData.length === 0) {
@@ -582,6 +694,7 @@
 		link.click();
 		document.body.removeChild(link);
 	}
+	
 	// Тест подключения
 	async function testConnection() {
 		const statusDiv = document.getElementById('connectionStatus');
