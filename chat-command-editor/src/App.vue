@@ -101,7 +101,6 @@
         :min-zoom="0.2"
         :max-zoom="4"
         :fit-view-on-init="true"
-        :direction="'LR'"
         @node-click="onNodeClick"
       >
         <Background />
