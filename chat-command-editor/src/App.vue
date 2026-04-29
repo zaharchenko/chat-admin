@@ -6,13 +6,13 @@
         {{ sidebarCollapsed ? '▶' : '◀' }}
       </button>
       <h2>Команды чата</h2>
-      
+
       <!-- Command List -->
       <div class="command-list">
         <button @click="addNewCommand" class="btn-add">+ Добавить команду</button>
         <ul>
-          <li 
-            v-for="command in commands" 
+          <li
+            v-for="command in commands"
             :key="command.id"
             :class="{ active: selectedCommand?.id === command.id }"
             @click="selectCommand(command)"
@@ -27,7 +27,7 @@
       <!-- Command Editor -->
       <div v-if="selectedCommand" class="command-editor">
         <h3>Редактирование команды</h3>
-        
+
         <div class="form-group">
           <label>ID:</label>
           <input v-model="selectedCommand.id" type="text" @blur="validateId" />
@@ -40,8 +40,8 @@
 
         <div class="form-group">
           <label>Ключевые слова (через запятую):</label>
-          <textarea 
-            v-model="keywordsText" 
+          <textarea
+            v-model="keywordsText"
             @input="updateKeywords"
             placeholder="войти, вход, login"
           ></textarea>
@@ -69,8 +69,8 @@
         <div class="form-group">
           <label>Дочерние команды:</label>
           <div class="childs-selector">
-            <div 
-              v-for="cmd in availableCommands" 
+            <div
+              v-for="cmd in availableCommands"
               :key="cmd.id"
               :class="{ selected: selectedCommand.childs.includes(cmd.id) }"
               @click="toggleChild(cmd.id)"
@@ -117,6 +117,7 @@ import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MarkerType } from '@vue-flow/core'
+import { getLayoutedElements } from './useLayout'
 
 // Default data from the example
 const defaultData = [
@@ -188,6 +189,15 @@ function updateFlow() {
       })
     }
   })
+
+  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      nodes.value,
+      edges.value,
+      'LR'  // ← направление: Left to Right
+  )
+
+  nodes.value = layoutedNodes
+  edges.value = layoutedEdges
 }
 
 // Watch for changes in commands
@@ -233,7 +243,7 @@ function deleteCommand(id) {
 
 // Validate ID uniqueness
 function validateId() {
-  const duplicates = commands.value.filter((c, i) => 
+  const duplicates = commands.value.filter((c, i) =>
     commands.value.findIndex(x => x.id === c.id) !== i
   )
   if (duplicates.length > 0) {
