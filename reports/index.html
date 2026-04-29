@@ -445,6 +445,7 @@ selectEntity(this);
 });
 }
 
+
 // Выбор сущности
 function selectEntity(element) {
 // Снимаем выделение со всех
@@ -464,6 +465,7 @@ document.getElementById('selectedEntity').textContent = `Выбрана сущн
 loadEntityFields(currentEntityType);
 }
 
+
 // Загрузка полей сущности
 async function loadEntityFields(entityTypeId) {
 const container = document.getElementById('fieldsContainer');
@@ -482,10 +484,13 @@ renderFields(availableFields);
 } else {
 container.innerHTML = '<div class="status-message error">Ошибка загрузки полей</div>';
 }
+
 } catch (error) {
 container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
 }
+
 }
+
 
 // Отображение полей
 function renderFields(fields) {
@@ -497,11 +502,13 @@ container.innerHTML = '<div class="status-message error">Нет доступны
 return;
 }
 
+
 // Проверяем, что fields - это объект с полями, а не массив
 if (Array.isArray(fields)) {
 container.innerHTML = '<div class="status-message error">Неверный формат полей</div>';
 return;
 }
+
 
 // Сортируем поля: сначала стандартные, потом пользовательские
 let sortedFields = [];
@@ -520,7 +527,7 @@ const checkbox = document.createElement('input');
 checkbox.type = 'checkbox';
 checkbox.id = `field_${code}`;
 checkbox.value = code;
-checkbox.addEventListener('change', handleFieldSelection);
+checkbox.onchange = function(event) { handleFieldSelection(event); };
 const label = document.createElement('span');
 label.className = 'field-label';
 label.textContent = (field && field.title) ? field.title : code;
@@ -534,6 +541,7 @@ container.appendChild(checkboxDiv);
 });
 }
 
+
 // Обработка выбора поля
 function handleFieldSelection(event) {
 const fieldCode = event.target.value;
@@ -543,8 +551,10 @@ selectedFields.push(fieldCode);
 } else {
 selectedFields = selectedFields.filter(f => f !== fieldCode);
 }
+
 updateButtons();
 }
+
 
 // Обновление состояния кнопок
 function updateButtons() {
@@ -553,6 +563,7 @@ const exportBtn = document.getElementById('exportBtn');
 generateBtn.disabled = selectedFields.length === 0;
 exportBtn.disabled = reportData.length === 0;
 }
+
 
 // Отображение смарт-процессов
 	function renderSmartProcesses(processes) {
@@ -565,18 +576,22 @@ exportBtn.disabled = reportData.length === 0;
 			return;
 		}
 		
-		processes.forEach(process => {
-			const div = document.createElement('div');
-			div.className = 'smart-process-item';
-			div.dataset.type = process.TYPE_ID;
-			div.dataset.name = process.NAME;
-			div.textContent = `📋 ${process.NAME}`;
-			div.addEventListener('click', function() {
-				selectEntity(this);
-			});
-			container.appendChild(div);
+			processes.forEach(process => {
+				const div = document.createElement('div');
+				div.className = 'smart-process-item';
+				// Используем правильные поля из API Bitrix24
+				const typeId = process.id || process.TYPE_ID;
+				const name = process.title || process.NAME || 'Без названия';
+				div.dataset.type = typeId;
+				div.dataset.name = name;
+				div.textContent = `📋 ${name}`;
+				div.addEventListener('click', function() {
+					selectEntity(this);
+				});
+				container.appendChild(div);
 		});
 	}
+	window.renderSmartProcesses = renderSmartProcesses;
 	// Генерация отчета
 	async function generateReport() {
 		if (selectedFields.length === 0) {
