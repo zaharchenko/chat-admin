@@ -424,130 +424,137 @@
 	}
 	
 	window.testConnection = testConnection;
-	window.loadSmartProcesses = loadSmartProcesses;
-	window.generateReport = generateReport;
-	window.exportToCSV = exportToCSV;
-	// Инициализация
-	document.addEventListener('DOMContentLoaded', function() {
-		initEntitySelection();
-	});
-	// Инициализация выбора сущностей
-	function initEntitySelection() {
-		const entityItems = document.querySelectorAll('.entity-item');
-		entityItems.forEach(item => {
-			item.addEventListener('click', function() {
-				selectEntity(this);
-			});
-		});
-	}
-	// Выбор сущности
-	function selectEntity(element) {
-		// Снимаем выделение со всех
-		document.querySelectorAll('.entity-item').forEach(item => {
-			item.classList.remove('selected');
-		});
-		document.querySelectorAll('.smart-process-item').forEach(item => {
-			item.classList.remove('selected');
-		});
-		// Выделяем текущий
-		element.classList.add('selected');
-		// Получаем тип сущности
-		currentEntityType = element.dataset.type;
-		const entityName = element.dataset.name || (element.textContent ? element.textContent.trim().replace(/^[^\s]+\s*/, '') : 'Неизвестно');
-		document.getElementById('selectedEntity').textContent = `Выбрана сущность: ${entityName}`;
-		// Загружаем поля
-		loadEntityFields(currentEntityType);
-	}
-	// Загрузка полей сущности
-	async function loadEntityFields(entityTypeId) {
-		const container = document.getElementById('fieldsContainer');
-		container.innerHTML = '<div class="loading-spinner"></div> Загрузка полей...';
-		try {
-			const portalUrl = document.getElementById('portalUrl').value;
-			const webhookUrl = document.getElementById('webhookUrl').value;
-			const fullUrl = `${portalUrl}${webhookUrl}crm.item.fields?entityTypeId=${entityTypeId}`;
-			const response = await fetch(fullUrl);
-			const result = await response.json();
-			
-			if (result.result) {
-				availableFields = result.result;
-				console.log("Загруженные поля:", availableFields);
-				renderFields(availableFields);
-			} else {
-				container.innerHTML = '<div class="status-message error">Ошибка загрузки полей</div>';
-			}
-		} catch (error) {
-			container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
-		}
-	}
-	
-	// Отображение полей
-	function renderFields(fields) {
-		const container = document.getElementById('fieldsContainer');
-		container.innerHTML = '';
-		
-		if (!fields || typeof fields !== 'object') {
-			container.innerHTML = '<div class="status-message error">Нет доступных полей</div>';
-			return;
-		}
-		
-		// Сортируем поля: сначала стандартные, потом пользовательские
-		let sortedFields = [];
-		sortedFields = Object.entries(fields).sort((a, b) => {
-			const aIsCustom = a[0].startsWith('UF_');
-			const bIsCustom = b[0].startsWith('UF_');
-			if (aIsCustom && !bIsCustom) return 1;
-			if (!aIsCustom && bIsCustom) return -1;
-			return (a[1] && a[1].title ? a[1].title : a[0]).localeCompare(b[1] && b[1].title ? b[1].title : b[0]);
-		});
-		
-		sortedFields.forEach(([code, field]) => {
-			const checkboxDiv = document.createElement('div');
-			checkboxDiv.className = 'field-checkbox';
-			const checkbox = document.createElement('input');
-			checkbox.type = 'checkbox';
-			checkbox.id = `field_${code}`;
-			checkbox.value = code;
-			checkbox.addEventListener('change', handleFieldSelection);
-			const label = document.createElement('span');
-			label.className = 'field-label';
-			label.textContent = (field && field.title) ? field.title : code;
-			const codeSpan = document.createElement('span');
-			codeSpan.className = 'field-code';
-			codeSpan.textContent = `[${code}]`;
-			checkboxDiv.appendChild(checkbox);
-			checkboxDiv.appendChild(label);
-			checkboxDiv.appendChild(codeSpan);
-			container.appendChild(checkboxDiv);
-		});
-	}
-	// Обработка выбора поля
-	function handleFieldSelection(event) {
-		const fieldCode = event.target.value;
-		const isChecked = event.target.checked;
-		if (isChecked) {
-			selectedFields.push(fieldCode);
-		} else {
-			selectedFields = selectedFields.filter(f => f !== fieldCode);
-		}
-		updateButtons();
-	}
-	// Обновление состояния кнопок
-	function updateButtons() {
-		const generateBtn = document.getElementById('generateBtn');
-		const exportBtn = document.getElementById('exportBtn');
-		generateBtn.disabled = selectedFields.length === 0;
-		exportBtn.disabled = reportData.length === 0;
-	}
-	// Обновление состояния кнопок
-	function updateButtons() {
-		const generateBtn = document.getElementById('generateBtn');
-		const exportBtn = document.getElementById('exportBtn');
-		generateBtn.disabled = selectedFields.length === 0;
-		exportBtn.disabled = reportData.length === 0;
-	}
-	
-	// Отображение смарт-процессов
+window.loadSmartProcesses = loadSmartProcesses;
+window.generateReport = generateReport;
+window.exportToCSV = exportToCSV;
+window.handleFieldSelection = handleFieldSelection;
+window.updateButtons = updateButtons;
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+initEntitySelection();
+});
+
+// Инициализация выбора сущностей
+function initEntitySelection() {
+const entityItems = document.querySelectorAll('.entity-item');
+entityItems.forEach(item => {
+item.addEventListener('click', function() {
+selectEntity(this);
+});
+});
+}
+
+// Выбор сущности
+function selectEntity(element) {
+// Снимаем выделение со всех
+document.querySelectorAll('.entity-item').forEach(item => {
+item.classList.remove('selected');
+});
+document.querySelectorAll('.smart-process-item').forEach(item => {
+item.classList.remove('selected');
+});
+// Выделяем текущий
+element.classList.add('selected');
+// Получаем тип сущности
+currentEntityType = element.dataset.type;
+const entityName = element.dataset.name || (element.textContent ? element.textContent.trim().replace(/^[^\s]+\s*/, '') : 'Неизвестно');
+document.getElementById('selectedEntity').textContent = `Выбрана сущность: ${entityName}`;
+// Загружаем поля
+loadEntityFields(currentEntityType);
+}
+
+// Загрузка полей сущности
+async function loadEntityFields(entityTypeId) {
+const container = document.getElementById('fieldsContainer');
+container.innerHTML = '<div class="loading-spinner"></div> Загрузка полей...';
+try {
+const portalUrl = document.getElementById('portalUrl').value;
+const webhookUrl = document.getElementById('webhookUrl').value;
+const fullUrl = `${portalUrl}${webhookUrl}crm.item.fields?entityTypeId=${entityTypeId}`;
+const response = await fetch(fullUrl);
+const result = await response.json();
+
+if (result.result) {
+availableFields = result.result;
+console.log("Загруженные поля:", availableFields);
+renderFields(availableFields);
+} else {
+container.innerHTML = '<div class="status-message error">Ошибка загрузки полей</div>';
+}
+} catch (error) {
+container.innerHTML = `<div class="status-message error">Ошибка: ${error.message}</div>`;
+}
+}
+
+// Отображение полей
+function renderFields(fields) {
+const container = document.getElementById('fieldsContainer');
+container.innerHTML = '';
+
+if (!fields || typeof fields !== 'object') {
+container.innerHTML = '<div class="status-message error">Нет доступных полей</div>';
+return;
+}
+
+// Проверяем, что fields - это объект с полями, а не массив
+if (Array.isArray(fields)) {
+container.innerHTML = '<div class="status-message error">Неверный формат полей</div>';
+return;
+}
+
+// Сортируем поля: сначала стандартные, потом пользовательские
+let sortedFields = [];
+sortedFields = Object.entries(fields).sort((a, b) => {
+const aIsCustom = a[0].startsWith('UF_');
+const bIsCustom = b[0].startsWith('UF_');
+if (aIsCustom && !bIsCustom) return 1;
+if (!aIsCustom && bIsCustom) return -1;
+return (a[1] && a[1].title ? a[1].title : a[0]).localeCompare(b[1] && b[1].title ? b[1].title : b[0]);
+});
+
+sortedFields.forEach(([code, field]) => {
+const checkboxDiv = document.createElement('div');
+checkboxDiv.className = 'field-checkbox';
+const checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.id = `field_${code}`;
+checkbox.value = code;
+checkbox.addEventListener('change', handleFieldSelection);
+const label = document.createElement('span');
+label.className = 'field-label';
+label.textContent = (field && field.title) ? field.title : code;
+const codeSpan = document.createElement('span');
+codeSpan.className = 'field-code';
+codeSpan.textContent = `[${code}]`;
+checkboxDiv.appendChild(checkbox);
+checkboxDiv.appendChild(label);
+checkboxDiv.appendChild(codeSpan);
+container.appendChild(checkboxDiv);
+});
+}
+
+// Обработка выбора поля
+function handleFieldSelection(event) {
+const fieldCode = event.target.value;
+const isChecked = event.target.checked;
+if (isChecked) {
+selectedFields.push(fieldCode);
+} else {
+selectedFields = selectedFields.filter(f => f !== fieldCode);
+}
+updateButtons();
+}
+
+// Обновление состояния кнопок
+function updateButtons() {
+const generateBtn = document.getElementById('generateBtn');
+const exportBtn = document.getElementById('exportBtn');
+generateBtn.disabled = selectedFields.length === 0;
+exportBtn.disabled = reportData.length === 0;
+}
+
+// Отображение смарт-процессов
 	function renderSmartProcesses(processes) {
 		const container = document.getElementById('smartProcessesList');
 		container.innerHTML = '';
