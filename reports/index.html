@@ -338,7 +338,7 @@
 		element.classList.add('selected');
 		// Получаем тип сущности
 		currentEntityType = element.dataset.type;
-		const entityName = element.dataset.name;
+		const entityName = element.dataset.name || (element.textContent ? element.textContent.trim().replace(/^[^\s]+\s*/, '') : 'Неизвестно');
 		document.getElementById('selectedEntity').textContent = `Выбрана сущность: ${entityName}`;
 		// Загружаем поля
 		loadEntityFields(currentEntityType);
@@ -355,6 +355,7 @@
 			const result = await response.json();
 			if (result.result) {
 				availableFields = result.result;
+				console.log("Загруженные поля:", availableFields);
 				renderFields(availableFields);
 			} else {
 				container.innerHTML = '<div class="status-message error">Ошибка загрузки полей</div>';
@@ -368,7 +369,7 @@
 		const container = document.getElementById('fieldsContainer');
 		container.innerHTML = '';
 		// Сортируем поля: сначала стандартные, потом пользовательские
-		const sortedFields = Object.entries(fields).sort((a, b) => {
+		const sortedFields = fields ? Object.entries(fields).sort((a, b) => {
 			const aIsCustom = a[0].startsWith('UF_');
 			const bIsCustom = b[0].startsWith('UF_');
 			if (aIsCustom && !bIsCustom) return 1;
@@ -385,7 +386,7 @@
 			checkbox.addEventListener('change', handleFieldSelection);
 			const label = document.createElement('span');
 			label.className = 'field-label';
-			label.textContent = field.title || code;
+			label.textContent = (field && field.title) ? field.title : code;
 			const codeSpan = document.createElement('span');
 			codeSpan.className = 'field-code';
 			codeSpan.textContent = `[${code}]`;
