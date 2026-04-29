@@ -10,22 +10,25 @@ export function getLayoutedElements(nodes, edges, direction = 'LR') {
 	// 🎯 Ключевой параметр: 'LR' = Left to Right
 	dagreGraph.setGraph({
 		rankdir: direction,      // 'LR' | 'TB' | 'BT' | 'RL'
-		nodesep: 60,             // отступ между узлами по вертикали
-		ranksep: 100,            // отступ между колонками
-		align: 'UL'              // выравнивание внутри ранга
+		nodesep: 80,             // отступ между узлами по вертикали (увеличено)
+		ranksep: 120,            // отступ между колонками (увеличено)
+		align: 'UL',             // выравнивание внутри ранга
+		ranker: 'network-simplex' // более качественный алгоритм расстановки
 	})
 
 	// Добавляем узлы в граф dagre
 	for (const node of nodes) {
 		dagreGraph.setNode(node.id, {
-			width: node.width || 150,   // примерная ширина, если не задана
-			height: node.height || 50   // примерная высота
+			width: node.width || 200,   // ширина узла (соответствует стилю в App.vue)
+			height: node.height || 60   // высота узла
 		})
 	}
 
 	// Добавляем связи
 	for (const edge of edges) {
-		dagreGraph.setEdge(edge.source, edge.target)
+		dagreGraph.setEdge(edge.source, edge.target, {
+			minlen: 1  // минимальная длина ребра
+		})
 	}
 
 	// Запускаем расчёт позиций
@@ -43,8 +46,8 @@ export function getLayoutedElements(nodes, edges, direction = 'LR') {
 			sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
 			// Новые координаты от dagre
 			position: {
-				x: nodeWithPosition.x - (node.width || 150) / 2,
-				y: nodeWithPosition.y - (node.height || 50) / 2
+				x: nodeWithPosition.x - (node.width || 200) / 2,
+				y: nodeWithPosition.y - (node.height || 60) / 2
 			}
 		}
 	})

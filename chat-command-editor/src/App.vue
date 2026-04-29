@@ -151,13 +151,21 @@ const availableCommands = computed(() => {
 // VueFlow nodes and edges
 const nodes = ref([])
 const edges = ref([])
+const savedPositions = ref({}) // Сохраняем позиции узлов
 
 // Update nodes and edges from commands
-function updateFlow() {
+function updateFlow(keepPositions = true) {
+  // Сохраняем текущие позиции перед обновлением
+  if (keepPositions && nodes.value.length > 0) {
+    nodes.value.forEach(node => {
+      savedPositions.value[node.id] = node.position
+    })
+  }
+
   nodes.value = commands.value.map(cmd => ({
     id: cmd.id,
     label: cmd.name || cmd.id,
-    position: { x: Math.random() * 400, y: Math.random() * 400 },
+    position: savedPositions.value[cmd.id] || { x: Math.random() * 400, y: Math.random() * 400 },
     style: {
       background: cmd.enabled ? '#fff' : '#f5f5f5',
       border: cmd.main ? '2px solid #4CAF50' : '1px solid #ccc',
@@ -194,6 +202,13 @@ function updateFlow() {
       edges.value,
       'LR'  // ← направление: Left to Right
   )
+
+  // Восстанавливаем сохранённые позиции для существующих узлов
+  layoutedNodes.forEach(node => {
+    if (keepPositions && savedPositions.value[node.id]) {
+      node.position = savedPositions.value[node.id]
+    }
+  })
 
   nodes.value = layoutedNodes
   edges.value = layoutedEdges
